@@ -10,12 +10,4 @@
 
   <artifactId>de.hu-berlin.slice.sandbox</artifactId>
 
-  <dependencies>
-    <dependency>
-      <groupId>de.hu-berlin.slice</groupId>
-      <artifactId>de.hu-berlin.slice.libs</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-
 </project>
