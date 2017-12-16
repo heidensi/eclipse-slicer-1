@@ -1,14 +1,17 @@
 package de.hu_berlin.slice.plugin.view;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -27,16 +30,21 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.part.ViewPart;
 
+import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import de.hu_berlin.slice.ast.ASTService;
+import de.hu_berlin.slice.plugin.AnalysisScopeFactory;
 import de.hu_berlin.slice.plugin.BundleService;
 import de.hu_berlin.slice.plugin.GuiceModule;
 import de.hu_berlin.slice.plugin.PluginImages;
 import de.hu_berlin.slice.plugin.ProjectService;
+import de.hu_berlin.slice.plugin.WorkspaceService;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
+import de.hu_berlin.slice.plugin.jobs.JobFactory;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 
 /**
  * Slice View
@@ -58,9 +66,12 @@ public class SliceView extends ViewPart {
     Injector injector = Guice.createInjector(new GuiceModule());
 
     EditorContextFactory editorContextFactory = injector.getInstance(EditorContextFactory.class);
-    ASTService           astService              = injector.getInstance(ASTService.class);
-    BundleService        bundleService          = injector.getInstance(BundleService.class);
+    ASTService           astService           = injector.getInstance(ASTService.class);
+    BundleService        bundleService        = injector.getInstance(BundleService.class);
     ProjectService       projectService       = injector.getInstance(ProjectService.class);
+    WorkspaceService     workspaceService     = injector.getInstance(WorkspaceService.class);
+    AnalysisScopeFactory analysisScopeFactory = injector.getInstance(AnalysisScopeFactory.class);
+    JobFactory           jobFactory           = injector.getInstance(JobFactory.class);
 
     // -------------------
     // -- UI stuff here --
@@ -157,7 +168,12 @@ public class SliceView extends ViewPart {
         //
         // Action to perform forward slice
         //
-        sliceForwardAction = createPlaceholderAction("Slice forward button clicked!");
+        sliceForwardAction = new Action() {
+            @Override
+            public void run() {
+                jobDemo(); // demo
+            }
+        };
         sliceForwardAction.setText("Slice forward");
         sliceForwardAction.setToolTipText("Performs a forward slice.");
         sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
@@ -167,63 +183,78 @@ public class SliceView extends ViewPart {
     // Action implementations.
     //
 
+    private void jobDemo() {
+//        Job job = Job.create("ok", new CompilationJob());
+//        job.schedule();
+    }
+
     /**
      * Demo, wrong place :)
      */
     private void demo() {
 
-        StringBuffer out = new StringBuffer();
+        List<String> out = new ArrayList<>();
 
         try {
 
             EditorContext editorContext = editorContextFactory.create(workbench);
 
-            ITextSelection textSelection = editorContext.getTextSelection();
-            ICompilationUnit compilationUnit = editorContext.getCompilationUnit();
-            IJavaProject javaProject = editorContext.getJavaProjectContext().getJavaProject();
+            ITextSelection    textSelection     = editorContext.getTextSelection();
+            ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
+            IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();
+            ASTNode           ast               = editorContext.getAST();
+            Statement         statementNode     = editorContext.getStatementNode();
+            MethodDeclaration methodDeclaration = editorContext.getMethodDeclaration();
 
-            out.append(String.format("Text selected: %s (offset: %d, length: %d)\n\n",
-                textSelection.getText(), textSelection.getOffset(), textSelection.getLength()));
-            out.append("Project name: " + javaProject.getElementName() + "\n\n");
+            out.add("Compilation unit: "                 + compilationUnit.getSource());
+            out.add("Text selected: "                    + textSelection.getText());
+            out.add("- offset: "                         + textSelection.getOffset());
+            out.add("- length: "                         + textSelection.getLength());
+            out.add("Project name: "                     + javaProject.getElementName());
+            out.add("Statement selected: "               + statementNode.toString());
+            out.add("Statement offset: "                 + statementNode.getStartPosition());
+            out.add("Statement length: "                 + statementNode.getLength());
+            out.add("Method this statement belongs to: " + methodDeclaration.toString());
 
-            //
-            //
-            //
-            ASTNode astNode = astService.createAST(compilationUnit);
-            Statement statementNode = astService.findStatementNodeForSelection(astNode, textSelection);
-            if (null == statementNode) {
-                out.append("The selected portion does not belong to a statement node!\n\n");
-            }
-            else {
-                out.append("Statement selected: " + statementNode.toString() + "\n\n");
-                out.append("Statement offset: "   + statementNode.getStartPosition() + "\n\n");
-                out.append("Statement length:"    + statementNode.getLength() + "\n\n");
-            }
+            SlicingContext slicingContext = new SlicingContext(editorContext);
 
-            //
-            //
-            //
-            try {
-                List<String> classPathList = projectService.resolveClassPathList(javaProject);
+            Job mainJob = jobFactory.create(slicingContext);
+            mainJob.addJobChangeListener(new JobChangeAdapter() {
+                @Override
+                public void done(IJobChangeEvent event) {
+                    // System.err.println(slicingContext.getClassHierarchy().toString());
+                }
+            });
+            mainJob.schedule();
 
-                String classPath = String.join(File.pathSeparator, classPathList);
-                out.append("Project class paths: " + classPath + "\n\n");
-            }
-            catch (JavaModelException e) {
-                out.append("Unable to resolve class paths.");
-            }
-
-            // AnalysisScope analysisScope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classPath, exclusionsFile);
-            // BackwardSliceStrategy slicer = new BackwardSliceStrategy();
-            // out.append("\n classes: " + slicer.slice(analysisScope));
+//                // "LMainlol"
+//                Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(analysisScope, classHierarchy);
+//
+//                Entrypoint demoEntrypoint = null;
+//                for (Entrypoint ep : entrypoints) {
+//                    demoEntrypoint = ep;
+//                    out.add("entrypoint: " + ep.getMethod().getSignature());
+//                    break;
+//                }
+//
+//                if (null == demoEntrypoint) {
+//                    throw new Exception("Could not determine entry point.");
+//                }
+//
+//                Set<IMethod> possibleTargets = classHierarchy.getPossibleTargets(demoEntrypoint.getMethod().getReference());
+//                out.add("Possible targets:");
+//                possibleTargets.forEach(method -> out.add(method.getName().toString()));
+//
+//                out.add(classHierarchy.toString());
         }
         catch (Exception e) {
-            out.append("-- Fehler --\n");
-            out.append(e.getMessage() + "\n");
-            out.append(e.getClass() + "\n\n");
+            out.add("-- An error occured! --\n");
+            out.add("message: " + e.getMessage());
+            out.add("class: " + e.getClass().getName());
+            out.add("stacktrace: " + Throwables.getStackTraceAsString(e));
         }
 
-        console.getDocument().set(out.toString());
+        console.getDocument().set(String.join("\n", out));
     }
 
     //

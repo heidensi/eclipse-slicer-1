@@ -8,20 +8,23 @@ Require-Bundle: org.eclipse.e4.core.contexts;bundle-version="1.6.0",
  org.eclipse.e4.core.di;bundle-version="1.6.100",
  org.eclipse.e4.core.di.extensions;bundle-version="0.15.0",
  org.eclipse.e4.ui.di;bundle-version="1.2.100",
- com.google.inject;bundle-version="3.0.0",
+ com.google.guava;bundle-version="21.0.0",
  org.eclipse.ui,
  org.eclipse.ui.editors;bundle-version="3.11.0",
  org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.13.50",
  org.eclipse.jdt.ui;bundle-version="3.13.50",
  org.eclipse.jface.text;bundle-version="3.12.0",
- org.eclipse.core.resources;bundle-version="3.12.0"
+ org.eclipse.core.resources;bundle-version="3.12.0",
+ com.google.inject;bundle-version="3.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
-  lib/com.ibm.wala.core-1.4.3.jar,
-  lib/com.ibm.wala.cast-1.4.3.jar,
-  lib/com.ibm.wala.cast.java-1.4.3.jar,
-  lib/com.ibm.wala.util-1.4.3.jar,
-  lib/com.ibm.wala.shrike-1.4.3.jar
+  libs/guice-4.1.0.jar,
+  libs/guice-assistedinject-4.1.0.jar,
+  libs/com.ibm.wala.core-1.4.3.jar,
+  libs/com.ibm.wala.cast-1.4.3.jar,
+  libs/com.ibm.wala.cast.java-1.4.3.jar,
+  libs/com.ibm.wala.util-1.4.3.jar,
+  libs/com.ibm.wala.shrike-1.4.3.jar
 Import-Package: org.slf4j;version="1.7.2"

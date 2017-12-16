@@ -3,12 +3,17 @@ package de.hu_berlin.slice.plugin.context;
 import javax.inject.Inject;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.hu_berlin.slice.ast.ASTService;
 import de.hu_berlin.slice.plugin.EclipseService;
 import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectContext;
 import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectContextFactoryException;
@@ -16,7 +21,11 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 /**
  * @author IShowerNaked
  */
+@SuppressWarnings("restriction")
 public class EditorContextFactory {
+
+    @Inject
+    ASTService astService;
 
     @Inject
     EclipseService eclipseService;
@@ -29,6 +38,8 @@ public class EditorContextFactory {
      */
     public class EditorContext {
 
+        private ASTNode ast;
+
         private ITextEditor textEditor;
 
         private ICompilationUnit compilationUnit;
@@ -36,6 +47,14 @@ public class EditorContextFactory {
         private ITextSelection textSelection;
 
         private JavaProjectContext javaProjectContext;
+
+        private Statement statementNode;
+
+        private MethodDeclaration methodDeclaration;
+
+        public ASTNode getAST() {
+            return ast;
+        }
 
         public JavaProjectContext getJavaProjectContext() {
             return javaProjectContext;
@@ -51,6 +70,14 @@ public class EditorContextFactory {
 
         public ITextSelection getTextSelection() {
             return textSelection;
+        }
+
+        public MethodDeclaration getMethodDeclaration() {
+            return methodDeclaration;
+        }
+
+        public Statement getStatementNode() {
+            return statementNode;
         }
     }
 
@@ -97,6 +124,15 @@ public class EditorContextFactory {
             throw new EditorContextFactoryException(null, e);
         }
 
+        ASTNode ast = astService.createAST(compilationUnit);
+
+        Statement statementNode = astService.findStatementNodeForSelection(ast, textSelection);
+        if (null == statementNode) {
+            throw new EditorContextFactoryException("The text selection does not belong to a statement node.", null);
+        }
+
+        MethodDeclaration methodDeclaration = (MethodDeclaration)ASTNodes.getParent(statementNode, MethodDeclaration.class);
+
         // ----------------------------------
         // -- Build and return the context --
         // ----------------------------------
@@ -106,6 +142,9 @@ public class EditorContextFactory {
         context.compilationUnit = compilationUnit;
         context.textSelection = textSelection;
         context.javaProjectContext = javaProjectContext;
+        context.ast = ast;
+        context.statementNode = statementNode;
+        context.methodDeclaration = methodDeclaration;
 
         return context;
     }
