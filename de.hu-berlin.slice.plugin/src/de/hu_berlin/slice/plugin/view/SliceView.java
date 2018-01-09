@@ -46,6 +46,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 
+import de.hu_berlin.slice.highlighting.HighlightSelected;
 /**
  * Slice View
  *
@@ -215,7 +216,11 @@ public class SliceView extends ViewPart {
             out.add("Statement offset: "                 + statementNode.getStartPosition());
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
-
+            
+            HighlightSelected h = new HighlightSelected();
+            h.deleteMarkers();
+            h.Highlight(textSelection);
+            
             SlicingContext slicingContext = new SlicingContext(editorContext);
 
             Job mainJob = jobFactory.create(slicingContext);
