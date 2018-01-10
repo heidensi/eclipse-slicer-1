@@ -9,6 +9,9 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
  * @author IShowerNaked
+ * 
+ * Collects all the necessary Information to run the Slice
+ * 
  */
 public class SlicingContext {
 

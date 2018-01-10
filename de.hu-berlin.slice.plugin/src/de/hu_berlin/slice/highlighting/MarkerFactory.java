@@ -11,10 +11,16 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PlatformUI;
 
+/*
+ * Highlights given lines from the Highlighting-Class and adds markers 
+ * on the left side
+ */
+
 public class MarkerFactory {
 
 	public static final String MARKER = "com.ibm.mymarkers.mymarker";
-
+	
+	//creating a new marker type
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("com.ibm.mymarkers.mymarker");
@@ -22,7 +28,7 @@ public class MarkerFactory {
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		return marker;
 	}
-
+	
 	//does not color the line, just adds a marker on the left side
 	public static IMarker createMarker(IResource res, int linenumber) throws CoreException {
 		IMarker marker = null;
@@ -32,7 +38,8 @@ public class MarkerFactory {
 		marker.setAttribute(IMarker.LINE_NUMBER, linenumber);
 		return marker;
 	}
-
+	
+	//Highlights a line and adds a marker
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("com.ibm.mymarkers.mymarker");
@@ -43,7 +50,7 @@ public class MarkerFactory {
 		return marker;
 	}
 
-
+	//finds the markers directly linked with that resource
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_ZERO));
@@ -51,7 +58,8 @@ public class MarkerFactory {
 			return new ArrayList<IMarker>();
 		}
 	}
-
+	
+	//finds all Markers related to this or sub-resources 
 	public static List<IMarker> findAllMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE));
@@ -59,7 +67,8 @@ public class MarkerFactory {
 			return new ArrayList<IMarker>();
 		}
 	}
-
+	
+	//returns the selection of the package explorer
 	public static TreeSelection getTreeSelection() {
 
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()

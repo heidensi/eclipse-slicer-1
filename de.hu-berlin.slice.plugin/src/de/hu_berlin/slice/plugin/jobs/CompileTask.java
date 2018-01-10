@@ -6,6 +6,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
  * @author IShowerNaked
+ * 
+ * Task to Compile the Project
+ * throws a TaskException if it can't build the Project
+ * 
  */
 class CompileTask implements ITask {
 

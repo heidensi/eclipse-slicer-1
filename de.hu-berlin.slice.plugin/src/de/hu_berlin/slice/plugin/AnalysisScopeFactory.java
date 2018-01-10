@@ -21,6 +21,12 @@ import de.hu_berlin.slice.plugin.eclipse.classpath.ClasspathScope;
 import de.hu_berlin.slice.plugin.eclipse.classpath.LibraryClasspathResolver;
 import de.hu_berlin.slice.plugin.eclipse.classpath.SourceClasspathResolver;
 
+/*
+ * Creates the AnalysisScope, which is than add to the SlicingContext.
+ * An AnalysisScope specifies the application and library code to be analyzed.
+ */
+
+
 @Singleton
 public class AnalysisScopeFactory {
 
@@ -31,12 +37,22 @@ public class AnalysisScopeFactory {
     LibraryClasspathResolver libraryClasspathResolver;
 
     public final static String SYNTHETIC_J2SE_MODEL = "dat/SyntheticJ2SEModel.txt";
-
+    
+    
+    /*
+     * Uses WALA Library to create an analysisScope.
+     */
     public AnalysisScope create(IJavaProject javaProject, File exclusionsFile) throws Exception {
-
-        AnalysisScope analysisScope = AnalysisScopeReader.readJavaScope(SYNTHETIC_J2SE_MODEL, exclusionsFile, this.getClass().getClassLoader());
-
-        Map<ClasspathLoader, List<Module>> modules = getModules(javaProject);
+    		
+    		//
+    		//Initialize AnalysisScope
+    		//
+    		AnalysisScope analysisScope = AnalysisScopeReader.readJavaScope(SYNTHETIC_J2SE_MODEL, exclusionsFile, this.getClass().getClassLoader());
+        
+    		//
+        //Maps each module to either Application, Extension, Primordial or Source and adds it to the AnalysisScope
+        //
+    		Map<ClasspathLoader, List<Module>> modules = getModules(javaProject);
         for (ClasspathLoader classpathLoader : modules.keySet()) {
             for (Module module : modules.get(classpathLoader)) {
                 analysisScope.addToScope(classpathLoader.getClassLoaderReference(), module);
@@ -45,7 +61,8 @@ public class AnalysisScopeFactory {
 
         return analysisScope;
     }
-
+    
+    //
     public Map<ClasspathLoader, List<Module>> getModules(IJavaProject javaProject) throws Exception {
 
         IClasspathEntry[] classPathEntries = javaProject.getResolvedClasspath(true);

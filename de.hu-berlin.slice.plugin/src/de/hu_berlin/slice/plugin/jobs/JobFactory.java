@@ -13,8 +13,11 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import com.google.inject.Injector;
 
-/**
+/*
  * @author IShowerNaked
+ * 
+ * Tries to do the slice
+ * Separates the slice into different tasks
  */
 @Singleton
 public class JobFactory {

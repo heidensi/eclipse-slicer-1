@@ -20,6 +20,8 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 
 /**
  * @author IShowerNaked
+ * 
+ * Extracts the needed information about the editor from the workbench.
  */
 @SuppressWarnings("restriction")
 public class EditorContextFactory {
@@ -51,7 +53,11 @@ public class EditorContextFactory {
         private Statement statementNode;
 
         private MethodDeclaration methodDeclaration;
-
+        
+        
+        /*
+         * Getter-Methods
+        */
         public ASTNode getAST() {
             return ast;
         }
@@ -90,6 +96,7 @@ public class EditorContextFactory {
         }
     }
 
+    //extracts and returns the needed Information from the workbench
     public EditorContext create(IWorkbench workbench) throws EditorContextFactoryException {
 
         IEditorPart editorPart = eclipseService.getActiveEditor(workbench);
@@ -116,6 +123,7 @@ public class EditorContextFactory {
 
         ITextSelection textSelection = (ITextSelection)selection;
 
+        //calls another class to save the Information about the whole Java project (see JavaProjectContextFactory)
         JavaProjectContext javaProjectContext;
         try {
             javaProjectContext = javaProjectContextFactory.create(compilationUnit);
@@ -125,7 +133,8 @@ public class EditorContextFactory {
         }
 
         ASTNode ast = astService.createAST(compilationUnit);
-
+        
+        //finds the selected text in the AST
         Statement statementNode = astService.findStatementNodeForSelection(ast, textSelection);
         if (null == statementNode) {
             throw new EditorContextFactoryException("The text selection does not belong to a statement node.", null);

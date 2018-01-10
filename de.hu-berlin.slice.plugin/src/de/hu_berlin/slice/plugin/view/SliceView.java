@@ -138,7 +138,8 @@ public class SliceView extends ViewPart {
         manager.add(clearViewAction);
         manager.add(refreshViewAction);
     }
-
+    
+    //Buttons get specified 
     private void configureActions() {
 
         //
@@ -190,9 +191,11 @@ public class SliceView extends ViewPart {
     // Action implementations.
     //
 
+    //Forward Slice
+    //Highlights random lines (at the moment)
     private void jobDemo() {
-//        Job job = Job.create("ok", new CompilationJob());
-//        job.schedule();
+    		//Job job = Job.create("ok", new CompilationJob());
+    		//job.schedule();
         Highlighting h = new Highlighting();
         try {
 			h.deleteMarkers();
@@ -208,6 +211,7 @@ public class SliceView extends ViewPart {
     }
 
     /**
+     * Backward Slice
      * Demo, wrong place :)
      */
     private void demo() {
@@ -215,9 +219,12 @@ public class SliceView extends ViewPart {
         List<String> out = new ArrayList<>();
 
         try {
-
+        	
+        		//creates Editor context from the active workbench
             EditorContext editorContext = editorContextFactory.create(workbench);
 
+            
+            //
             ITextSelection    textSelection     = editorContext.getTextSelection();
             ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
             IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();
@@ -235,12 +242,15 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
             
+            //highlights the selected text
             Highlighting h = new Highlighting();
             h.deleteMarkers();
             h.HighlightSelected(textSelection);
             
+            //adds editor context to the slicing context
             SlicingContext slicingContext = new SlicingContext(editorContext);
 
+            //
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
                 @Override

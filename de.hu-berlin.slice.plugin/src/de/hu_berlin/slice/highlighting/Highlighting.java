@@ -13,8 +13,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+/*
+ * The Highlighting Class contains the methods for highlighting different parts of the source code in the editor.
+ * for example selected or random text.
+ */
+
 public class Highlighting {
 
+	
+	//Highlights the given Section of the marked text
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -25,6 +32,8 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	//Highlights a Line according to a given line number
+	//This method is needed for the line numbers the slicer returns
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -40,6 +49,7 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	//Highlights random lines in the Editor
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -59,12 +69,14 @@ public class Highlighting {
     		HighlightLine(colrThisLine);
 		}
 	}
-
+	
+	
+	//Deletes all the highlighting and markers linked directly to the resource
 	public void deleteMarkers() throws CoreException {
 		
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
 				.getEditorInput().getAdapter(IFile.class);
-
+		
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
 		for (IMarker marker : markers) {
 			marker.delete();
