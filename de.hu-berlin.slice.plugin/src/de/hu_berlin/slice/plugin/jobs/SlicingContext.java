@@ -9,6 +9,8 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
  * @author IShowerNaked
+ * 
+ * Collects all the necessary information needed to run the slice
  */
 public class SlicingContext {
 
@@ -22,6 +24,7 @@ public class SlicingContext {
         this.editorContext = editorContext;
     }
 
+    //GETTER-Methods
     public IJavaProject getJavaProject() {
         return editorContext.getJavaProjectContext().getJavaProject();
     }

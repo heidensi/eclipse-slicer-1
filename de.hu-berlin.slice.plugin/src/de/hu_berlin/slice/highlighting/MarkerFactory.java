@@ -15,6 +15,7 @@ public class MarkerFactory {
 
 	public static final String MARKER = "com.ibm.mymarkers.mymarker";
 
+	//creating the new marker type
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("com.ibm.mymarkers.mymarker");
@@ -33,6 +34,7 @@ public class MarkerFactory {
 		return marker;
 	}
 
+	//Highlights a line and adds a marker
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("com.ibm.mymarkers.mymarker");
@@ -43,7 +45,7 @@ public class MarkerFactory {
 		return marker;
 	}
 
-
+	//finds the markers directly linked with that resource
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_ZERO));
@@ -52,6 +54,7 @@ public class MarkerFactory {
 		}
 	}
 
+	//finds all markers related to this or any sub-resources
 	public static List<IMarker> findAllMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE));
@@ -60,6 +63,7 @@ public class MarkerFactory {
 		}
 	}
 
+    //Returns the selection of the package explorer
 	public static TreeSelection getTreeSelection() {
 
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()

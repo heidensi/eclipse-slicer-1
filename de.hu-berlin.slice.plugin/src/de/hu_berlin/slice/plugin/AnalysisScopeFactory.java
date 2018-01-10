@@ -22,6 +22,11 @@ import de.hu_berlin.slice.plugin.eclipse.classpath.LibraryClasspathResolver;
 import de.hu_berlin.slice.plugin.eclipse.classpath.SourceClasspathResolver;
 
 @Singleton
+
+/**
+ * Creates the Analysis Scope, which is then added to the SlicingContext
+ * An AnalysisScope specifies the application and library code to be analyzed.
+ */
 public class AnalysisScopeFactory {
 
     @Inject
@@ -32,13 +37,20 @@ public class AnalysisScopeFactory {
 
     public final static String SYNTHETIC_J2SE_MODEL = "dat/SyntheticJ2SEModel.txt";
 
+    /**
+     * uses WALA Library to create the analysis scope
+     * 
+     */
     public AnalysisScope create(IJavaProject javaProject, File exclusionsFile) throws Exception {
 
+    	//initialize analysisScope
         AnalysisScope analysisScope = AnalysisScopeReader.readJavaScope(SYNTHETIC_J2SE_MODEL, exclusionsFile, this.getClass().getClassLoader());
 
+        //Maps each module to either Application, Extension, Primordial or Source and adds it to the AnalysisScope
         Map<ClasspathLoader, List<Module>> modules = getModules(javaProject);
         for (ClasspathLoader classpathLoader : modules.keySet()) {
             for (Module module : modules.get(classpathLoader)) {
+            	//adds each module to the analysis scope
                 analysisScope.addToScope(classpathLoader.getClassLoaderReference(), module);
             }
         }

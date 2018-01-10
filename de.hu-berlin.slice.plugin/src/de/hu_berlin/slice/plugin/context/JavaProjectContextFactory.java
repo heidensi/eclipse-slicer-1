@@ -10,6 +10,9 @@ import org.eclipse.jdt.core.JavaModelException;
 
 /**
  * @author IShowerNaked
+ * 
+ * Used by EditorContextFactory to turn an ICompilationUnit into an IProject and finally return an IJavaProject 
+ * 
  */
 public class JavaProjectContextFactory {
 

@@ -34,6 +34,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
  * @author IShowerNaked
+ * Task where the slicing happens
  */
 public class EntrypointLocatorTask implements ITask {
 
@@ -55,6 +56,10 @@ public class EntrypointLocatorTask implements ITask {
             for (IClassLoader cl : classHierarchy.getLoaders()) {
                 System.err.println(cl.getClass().getName());
             }
+            
+            //
+            //Iterate through all application modules to collect the entrypoints
+            //
             IClassLoader classLoader = classHierarchy.getLoader(ClassLoaderReference.Application);
 
             List<Entrypoint> entrypoints = new ArrayList<>();

@@ -15,6 +15,8 @@ import com.google.inject.Injector;
 
 /**
  * @author IShowerNaked
+ * 
+ * Separates the slice into several tasks.
  */
 @Singleton
 public class JobFactory {

@@ -13,8 +13,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+/*
+ * The Highlighting class contains the methods for highlight different parts of the source code in the Editor,
+ * for example random or selected text
+ */
 public class Highlighting {
 
+	//Highlights whatever you marked
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -25,6 +30,7 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	//Hightlights a Line according to a given line number
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -40,6 +46,7 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	//Highlights any random line numbers
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -60,6 +67,7 @@ public class Highlighting {
 		}
 	}
 
+	//Deletes all the highlights and markers linked directly to the resource
 	public void deleteMarkers() throws CoreException {
 		
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()

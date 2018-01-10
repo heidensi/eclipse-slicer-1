@@ -139,6 +139,7 @@ public class SliceView extends ViewPart {
         manager.add(refreshViewAction);
     }
 
+    //buttons get specified
     private void configureActions() {
 
         //
@@ -190,6 +191,7 @@ public class SliceView extends ViewPart {
     // Action implementations.
     //
 
+    //highlights random lines (at the moment)
     private void jobDemo() {
 //        Job job = Job.create("ok", new CompilationJob());
 //        job.schedule();
@@ -216,6 +218,7 @@ public class SliceView extends ViewPart {
 
         try {
 
+        	//create editor context from the active workbench
             EditorContext editorContext = editorContextFactory.create(workbench);
 
             ITextSelection    textSelection     = editorContext.getTextSelection();
@@ -225,6 +228,7 @@ public class SliceView extends ViewPart {
             Statement         statementNode     = editorContext.getStatementNode();
             MethodDeclaration methodDeclaration = editorContext.getMethodDeclaration();
 
+            //Print information about editor context to console
             out.add("Compilation unit: "                 + compilationUnit.getSource());
             out.add("Text selected: "                    + textSelection.getText());
             out.add("- offset: "                         + textSelection.getOffset());
@@ -235,9 +239,11 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
             
+            //Highlight selected text
             Highlighting h = new Highlighting();
             h.deleteMarkers();
             h.HighlightSelected(textSelection);
+            
             
             SlicingContext slicingContext = new SlicingContext(editorContext);
 
