@@ -1,89 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Sample Category"
-            id="de.hu_berlin.slice.commands.category">
-      </category>
-      <command
-            name="Sample Command"
-            categoryId="de.hu_berlin.slice.commands.category"
-            id="de.hu_berlin.slice.commands.sampleCommand">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="de.hu_berlin.slice.commands.sampleCommand"
-            class="de.hu_berlin.slice.handlers.SampleHandler">
-      </handler>
-   </extension>
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="de.hu_berlin.slice.commands.sampleCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+6"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               label="Sample Menu"
-               mnemonic="M"
-               id="de.hu_berlin.slice.menus.sampleMenu">
-            <command
-                  commandId="de.hu_berlin.slice.commands.sampleCommand"
-                  mnemonic="S"
-                  id="de.hu_berlin.slice.menus.sampleCommand">
-            </command>
-         </menu>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="de.hu_berlin.slice.toolbars.sampleToolbar">
-            <command
-                  commandId="de.hu_berlin.slice.commands.sampleCommand"
-                  icon="icons/logo.png"
-                  tooltip="Say hello world"
-                  id="de.hu_berlin.slice.toolbars.sampleCommand">
-            </command>
-         </toolbar>
-      </menuContribution>
-   </extension>
-
-   <!-- Debug-View for easier Plugin-Development :-) -->
-   <extension point="org.eclipse.ui.views">
-
-      <category name="Java" id="de.hu_berlin.slice.plugin.view.SliceView"></category>
-
-      <view name="Slice View"
-            inject="true"
-            icon="icons/logo.png"
-            category="de.hu_berlin.slice.plugin.view.SliceView"
-            class="de.hu_berlin.slice.plugin.view.SliceView"
-            id="de.hu_berlin.slice.plugin.view.SliceView">
-      </view>
-
-   </extension>
-
-   <extension point="org.eclipse.ui.perspectiveExtensions">
-
-      <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
-         <view ratio="0.5"
-               relative="org.eclipse.ui.views.ProblemView"
-               relationship="right"
-               id="de.hu_berlin.slice.plugin.view.SliceView">
-         </view>
-      </perspectiveExtension>
-
-   </extension>
-
+    <extension point="org.eclipse.ui.commands">
+        <category name="Sample Category" id="de.hu_berlin.slice.commands.category" />
+        <command name="Sample Command" categoryId="de.hu_berlin.slice.commands.category" id="de.hu_berlin.slice.commands.sampleCommand" />
+    </extension>
+    <extension point="org.eclipse.ui.handlers">
+        <handler commandId="de.hu_berlin.slice.commands.sampleCommand" class="de.hu_berlin.slice.handlers.SampleHandler" />
+    </extension>
+    <extension point="org.eclipse.ui.bindings">
+        <key commandId="de.hu_berlin.slice.commands.sampleCommand" contextId="org.eclipse.ui.contexts.window" sequence="M1+6" schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
+    </extension>
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+            <menu label="Sample Menu" mnemonic="M" id="de.hu_berlin.slice.menus.sampleMenu">
+                <command commandId="de.hu_berlin.slice.commands.sampleCommand" mnemonic="S" id="de.hu_berlin.slice.menus.sampleCommand" />
+            </menu>
+        </menuContribution>
+        <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            <toolbar id="de.hu_berlin.slice.toolbars.sampleToolbar">
+                <command commandId="de.hu_berlin.slice.commands.sampleCommand" icon="icons/logo.png" tooltip="Say hello world" id="de.hu_berlin.slice.toolbars.sampleCommand" />
+            </toolbar>
+        </menuContribution>
+    </extension>
+    <!-- Debug-View for easier Plugin-Development :-) -->
+    <extension point="org.eclipse.ui.views">
+        <category name="Java" id="de.hu_berlin.slice.plugin.view.SliceView" />
+        <view name="Slice View" inject="true" icon="icons/logo.png" category="de.hu_berlin.slice.plugin.view.SliceView" class="de.hu_berlin.slice.plugin.view.SliceView" id="de.hu_berlin.slice.plugin.view.SliceView" />
+    </extension>
+    <extension point="org.eclipse.ui.perspectiveExtensions">
+        <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+            <view ratio="0.5" relative="org.eclipse.ui.views.ProblemView" relationship="right" id="de.hu_berlin.slice.plugin.view.SliceView" />
+        </perspectiveExtension>
+    </extension>
+    <extension point="org.eclipse.core.resources.markers" id="com.ibm.mymarkers.mymarker" name="Marker">
+        <super type="org.eclipse.core.resources.textmarker" />
+        <super type="org.eclipse.core.resources.marker" />
+        <persistent value="true" />
+    </extension>
+    <extension point="org.eclipse.core.resources.markers" id="com.ibm.mymarkers.mymarker" name="Marker">
+        <super type="org.eclipse.core.resources.marker" />
+        <super type="org.eclipse.core.resources.textmarker" />
+        <super type="org.eclipse.core.resources.marker" />
+        <persistent value="true" />
+    </extension>
+    <extension point="org.eclipse.ui.editors.markerAnnotationSpecification" id="myannotationspecification" name="MyAnnotation">
+        <specification annotationType="com.ibm.myannotation" label="MyAnnotation" overviewRulerPreferenceKey="clruler" overviewRulerPreferenceValue="true" colorPreferenceKey="clcolor" colorPreferenceValue="51,255,128" textPreferenceKey="cltext" textPreferenceValue="true" verticalRulerPreferenceKey="clvertical" verticalRulerPreferenceValue="true" textStylePreferenceKey="clstyle" textStylePreferenceValue="BOX" />
+    </extension>
+    <extension point="org.eclipse.ui.editors.annotationTypes">
+        <type markerSeverity="0" super="org.eclipse.ui.workbench.texteditor.info" name="com.ibm.myannotation" markerType="com.ibm.mymarkers.mymarker" />
+    </extension>
 </plugin>
