@@ -23,6 +23,7 @@ public class MarkerFactory {
 		return marker;
 	}
 
+	//does not color the line, just adds a marker on the left side
 	public static IMarker createMarker(IResource res, int linenumber) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("com.ibm.mymarkers.mymarker");
@@ -42,16 +43,6 @@ public class MarkerFactory {
 		return marker;
 	}
 
-	public static IMarker createMarker(IResource res, int linenumber, int offset, int length) throws CoreException {
-		IMarker marker = null;
-		marker = res.createMarker("com.ibm.mymarkers.mymarker");
-		marker.setAttribute("description", "this is one of my markers");
-		marker.setAttribute(IMarker.MESSAGE, "My Marker");
-		marker.setAttribute(IMarker.LINE_NUMBER, linenumber);
-		marker.setAttribute(IMarker.CHAR_START, offset);
-		marker.setAttribute(IMarker.CHAR_END, offset + length);
-		return marker;
-	}
 
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {

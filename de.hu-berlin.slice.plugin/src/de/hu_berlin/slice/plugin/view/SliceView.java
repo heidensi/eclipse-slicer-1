@@ -2,9 +2,12 @@ package de.hu_berlin.slice.plugin.view;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -18,6 +21,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -28,7 +32,10 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
@@ -45,8 +52,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
-
-import de.hu_berlin.slice.highlighting.HighlightSelected;
+import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
  *
@@ -187,6 +193,18 @@ public class SliceView extends ViewPart {
     private void jobDemo() {
 //        Job job = Job.create("ok", new CompilationJob());
 //        job.schedule();
+        Highlighting h = new Highlighting();
+        try {
+			h.deleteMarkers();
+	        h.HighlightRandomLines();
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
     }
 
     /**
@@ -217,9 +235,9 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
             
-            HighlightSelected h = new HighlightSelected();
+            Highlighting h = new Highlighting();
             h.deleteMarkers();
-            h.Highlight(textSelection);
+            h.HighlightSelected(textSelection);
             
             SlicingContext slicingContext = new SlicingContext(editorContext);
 
