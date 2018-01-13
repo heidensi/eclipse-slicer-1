@@ -9,8 +9,6 @@ import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
  * @author IShowerNaked
  * Task that uses the AnalysisScope from the Slicing Context to create the ClassHierarchy and adds it to the Slicing Context.
  * The ClassHierarchy is the central collection of IClasses that define your analysis scope (the program being analyzed).
- * Throws an TaskException if it can't create a ClassHierarchy.
- * Uses WALA Library.
  */
 class ClassHierarchyTask implements ITask {
 

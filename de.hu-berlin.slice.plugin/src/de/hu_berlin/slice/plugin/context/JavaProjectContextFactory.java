@@ -10,14 +10,14 @@ import org.eclipse.jdt.core.JavaModelException;
 
 /**
  * @author IShowerNaked
- * 
- * extracts the needed Information about the whole Java Project either from an ICompliationUnit, IProject
+ * Extracts the needed Information about the Java Project either from an ICompliationUnit, IProject
  * or IJavaProject.
- * 
- * Used by EditorContextFactory to turn an ICompliationUnit into an IProject and finally into an IJavaProject.
  */
 public class JavaProjectContextFactory {
 
+	/**
+	 * Represents the collected Information about the javaProject.
+	 */
     public class JavaProjectContext {
 
         IJavaProject javaProject;
@@ -26,7 +26,10 @@ public class JavaProjectContextFactory {
             return javaProject;
         }
     }
-
+    
+    /**
+     * Exception for the failure of creating the java project context.
+     */
     public class JavaProjectContextFactoryException extends Exception {
 
         private static final long serialVersionUID = 1L;
@@ -35,7 +38,12 @@ public class JavaProjectContextFactory {
             super(msg, e);
         }
     }
-
+    /**
+     * Creates the JavaProjectContext.
+     * @param compilationUnit
+     * @return JavaProjectContext
+     * @throws JavaProjectContextFactoryException
+     */
     public JavaProjectContext create(ICompilationUnit compilationUnit) throws JavaProjectContextFactoryException {
 
         IResource correspondingResource = null;
@@ -50,7 +58,13 @@ public class JavaProjectContextFactory {
 
         return create(project);
     }
-
+    
+    /**
+     * Creates the JavaProjectContext.
+     * @param project
+     * @return	JavaProjectContext
+     * @throws JavaProjectContextFactoryException
+     */
     public JavaProjectContext create(IProject project) throws JavaProjectContextFactoryException {
 
         try {
@@ -65,7 +79,12 @@ public class JavaProjectContextFactory {
         IJavaProject javaProject = JavaCore.create(project);
         return create(javaProject);
     }
-
+    
+    /**
+     * Creates the JavaProjectContext.
+     * @param javaProject
+     * @return JavaProjectContext
+     */
     public JavaProjectContext create(IJavaProject javaProject) {
 
         // ----------------------------------

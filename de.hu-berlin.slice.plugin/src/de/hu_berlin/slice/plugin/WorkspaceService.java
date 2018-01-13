@@ -10,17 +10,26 @@ import org.eclipse.core.runtime.Path;
 
 /**
  * @author IShowerNaked
+ * Service Class represents all the needed Information regarding the workspace.
  */
 @Singleton
 public class WorkspaceService {
 
+	/**
+	 * @param path
+	 * @return
+	 */
     public IPath getAbsolutePath(IPath path) {
 
         String absolutePathAsString = getAbsolutePathAsString(path);
 
         return Path.fromOSString(absolutePathAsString);
     }
-
+    
+    /**
+     * @param path
+     * @return
+     */
     public String getAbsolutePathAsString(IPath path) {
 
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();

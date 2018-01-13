@@ -11,10 +11,7 @@ import de.hu_berlin.slice.plugin.BundleService;
 
 /**
  * @author IShowerNaked
- * Task to get the AnalysisScope and add it to the Slicing Context. 
- * Calls AnalysisScopeFactory.
- * Throws TaskException if it fails.
- * 
+ *Represents a Task creating an AnalysisScope and adding it to the Slicing Context.
  */
 class BuildScopeTask implements ITask {
 	
@@ -32,8 +29,6 @@ class BuildScopeTask implements ITask {
         try {
             exclusionsFile = bundleService.getFileByPath("dat/Java60RegressionExclusions.txt");
             
-            //saving the analysisScope to the Slicing Context
-            //calls AnalysisScopeFactory
             context.analysisScope = analysisScopeFactory.create(context.getJavaProject(), exclusionsFile);
         } catch (Exception e) {
             throw new TaskException(null, e);

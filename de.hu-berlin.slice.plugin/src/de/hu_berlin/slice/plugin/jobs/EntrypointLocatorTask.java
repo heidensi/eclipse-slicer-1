@@ -56,10 +56,8 @@ public class EntrypointLocatorTask implements ITask {
             for (IClassLoader cl : classHierarchy.getLoaders()) {
                 System.err.println(cl.getClass().getName());
             }
-            
-            //
+
             //Iterate through all Application modules to collect the entrypoints.
-            //
             IClassLoader classLoader = classHierarchy.getLoader(ClassLoaderReference.Application);
 
             List<Entrypoint> entrypoints = new ArrayList<>();

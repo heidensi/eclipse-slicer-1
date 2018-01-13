@@ -13,15 +13,17 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-/*
- * The Highlighting Class contains the methods for highlighting different parts of the source code in the editor.
- * for example selected or random text.
+/**
+ * Class determines which lines should be highlighted.
  */
 
 public class Highlighting {
 
-	
-	//Highlights the given Section of the marked text
+	/**
+	 * Highlights the given Section of the marked text.
+	 * @param textSelection
+	 * @throws CoreException
+	 */
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -32,8 +34,12 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
-	//Highlights a Line according to a given line number
-	//This method is needed for the line numbers the slicer returns
+	/**
+	 * Highlights a Line according to a given line number.
+	 * @param linenumber
+	 * @throws CoreException
+	 * @throws BadLocationException
+	 */
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -49,7 +55,11 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
-	//Highlights random lines in the Editor
+	/**
+	 * Highlights random lines in the Editor.
+	 * @throws CoreException
+	 * @throws BadLocationException
+	 */
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -71,7 +81,10 @@ public class Highlighting {
 	}
 	
 	
-	//Deletes all the highlighting and markers linked directly to the resource
+	/**
+	 * Deletes all the highlights and markers linked directly to the resource.
+	 * @throws CoreException
+	 */
 	public void deleteMarkers() throws CoreException {
 		
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()

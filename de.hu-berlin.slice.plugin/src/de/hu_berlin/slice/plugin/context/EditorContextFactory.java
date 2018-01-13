@@ -20,8 +20,7 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 
 /**
  * @author IShowerNaked
- * 
- * Extracts the needed information about the editor from the workbench.
+ * Represents the creating process of the editor context.
  */
 @SuppressWarnings("restriction")
 public class EditorContextFactory {
@@ -36,6 +35,7 @@ public class EditorContextFactory {
     JavaProjectContextFactory javaProjectContextFactory;
 
     /**
+     * Represents the collected information from the workbench.
      * @author IShowerNaked
      */
     public class EditorContext {
@@ -55,9 +55,7 @@ public class EditorContextFactory {
         private MethodDeclaration methodDeclaration;
         
         
-        /*
-         * Getter-Methods
-        */
+        
         public ASTNode getAST() {
             return ast;
         }
@@ -86,7 +84,10 @@ public class EditorContextFactory {
             return statementNode;
         }
     }
-
+    
+    /**
+     *Exception for the failure of creating the editor context.
+     */
     public class EditorContextFactoryException extends Exception {
 
         private static final long serialVersionUID = 1L;
@@ -96,7 +97,12 @@ public class EditorContextFactory {
         }
     }
 
-    //extracts and returns the needed Information from the workbench
+    /**
+     * Extracts and returns the needed Information from the workbench
+     * @param workbench
+     * @return editor context
+     * @throws EditorContextFactoryException
+     */
     public EditorContext create(IWorkbench workbench) throws EditorContextFactoryException {
 
         IEditorPart editorPart = eclipseService.getActiveEditor(workbench);
@@ -123,7 +129,6 @@ public class EditorContextFactory {
 
         ITextSelection textSelection = (ITextSelection)selection;
 
-        //calls another class to save the Information about the whole Java project (see JavaProjectContextFactory)
         JavaProjectContext javaProjectContext;
         try {
             javaProjectContext = javaProjectContextFactory.create(compilationUnit);
@@ -134,7 +139,6 @@ public class EditorContextFactory {
 
         ASTNode ast = astService.createAST(compilationUnit);
         
-        //finds the selected text in the AST
         Statement statementNode = astService.findStatementNodeForSelection(ast, textSelection);
         if (null == statementNode) {
             throw new EditorContextFactoryException("The text selection does not belong to a statement node.", null);
