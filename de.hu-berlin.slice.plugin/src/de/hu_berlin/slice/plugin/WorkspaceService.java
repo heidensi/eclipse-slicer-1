@@ -10,12 +10,13 @@ import org.eclipse.core.runtime.Path;
 
 /**
  * @author IShowerNaked
- * Service Class represents all the needed Information regarding the workspace.
+ * Service Class to get all the needed Information regarding the workspace.
  */
 @Singleton
 public class WorkspaceService {
 
 	/**
+	 * Returns the absolute Path.
 	 * @param path
 	 * @return
 	 */
@@ -27,6 +28,7 @@ public class WorkspaceService {
     }
     
     /**
+     * Returns the absolute Path as a String.
      * @param path
      * @return
      */
