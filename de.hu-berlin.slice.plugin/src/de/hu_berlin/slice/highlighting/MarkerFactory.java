@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class MarkerFactory {
 
-	public static final String MARKER = "com.ibm.mymarkers.mymarker";
+	public static final String MARKER = "de.hu_berlin.slice.marker.slicer";
 	
 	/**
 	 * Creates a new marker type.
@@ -26,9 +26,10 @@ public class MarkerFactory {
 	 * @return marker
 	 * @throws CoreException
 	 */
+
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("com.ibm.mymarkers.mymarker");
+		marker = res.createMarker("de.hu_berlin.slice.marker.slicer"); //ID from the plugin.xml
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		return marker;
@@ -45,7 +46,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int linenumber) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("com.ibm.mymarkers.mymarker");
+		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.LINE_NUMBER, linenumber);
@@ -65,7 +66,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("com.ibm.mymarkers.mymarker");
+		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.CHAR_START, offset);
