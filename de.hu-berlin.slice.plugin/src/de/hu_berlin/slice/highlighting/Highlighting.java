@@ -21,7 +21,8 @@ public class Highlighting {
 
 	/**
 	 * Highlights the given Section of the marked text.
-	 * @param textSelection
+	 * @param textSelection 
+	 * the selected text in the editor
 	 * @throws CoreException
 	 */
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
@@ -37,6 +38,7 @@ public class Highlighting {
 	/**
 	 * Highlights a Line according to a given line number.
 	 * @param linenumber
+	 * line number from the editor
 	 * @throws CoreException
 	 * @throws BadLocationException
 	 */

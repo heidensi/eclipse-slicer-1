@@ -55,7 +55,6 @@ import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
- *
  * @author IShowerNaked
  */
 public class SliceView extends ViewPart {

@@ -10,8 +10,8 @@ import de.hu_berlin.slice.plugin.AnalysisScopeFactory;
 import de.hu_berlin.slice.plugin.BundleService;
 
 /**
+ * Represents a Task creating an AnalysisScope and adding it to the Slicing Context.
  * @author IShowerNaked
- *Represents a Task creating an AnalysisScope and adding it to the Slicing Context.
  */
 class BuildScopeTask implements ITask {
 	

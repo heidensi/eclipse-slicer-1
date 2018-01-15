@@ -22,8 +22,8 @@ import com.ibm.wala.classLoader.SourceDirectoryTreeModule;
 import com.ibm.wala.classLoader.SourceFileModule;
 
 /**
- * @author IShowerNaked
  * TODO
+ * @author IShowerNaked
  */
 @Singleton
 public class ProjectService {

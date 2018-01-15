@@ -40,8 +40,11 @@ public class AnalysisScopeFactory {
     /**
      * Creates an AnalysisScope.
      * @param javaProject
+     * current java project
      * @param exclusionsFile
-     * @return	analysisScope
+     * XML-based file, which tells WALA to ignore certain classes or packages
+     * @return analysisScope
+     * which specifies the application and library code to be analyzed.
      * @throws Exception
      */
     public AnalysisScope create(IJavaProject javaProject, File exclusionsFile) throws Exception {
@@ -60,9 +63,10 @@ public class AnalysisScopeFactory {
     }
     
     /**
-     * TODO 
+     * Creates a hash map of the classpath entries.
      * @param javaProject
-     * @return
+     * current java project
+     * @return Hash map mapping the classpath entries either to Application, Source, Primordial or Extension
      * @throws Exception
      */
     public Map<ClasspathLoader, List<Module>> getModules(IJavaProject javaProject) throws Exception {
@@ -71,12 +75,14 @@ public class AnalysisScopeFactory {
 
         ClasspathScope classpathScope = new ClasspathScope(javaProject);
         classpathScope.setIncludeSource(false); // TODO: This must be made available as a UI option
-
+        
+        
         Map<ClasspathLoader, List<Module>> modules = new HashMap<>();
         for (ClasspathLoader classpathLoader : ClasspathLoader.values()) {
             modules.put(classpathLoader, new ArrayList<>());
         }
-
+        
+        
         for (IClasspathEntry classpathEntry : classPathEntries) {
 
             Map.Entry<ClasspathLoader, Module> moduleEntry;
@@ -91,7 +97,8 @@ public class AnalysisScopeFactory {
                 default:
                     throw new Exception();
             }
-
+            
+            //maps the module tree directory to the corresponding ClasspathLoaderRefrence
             if (null != moduleEntry) {
                 modules.get(moduleEntry.getKey()).add(moduleEntry.getValue());
             }

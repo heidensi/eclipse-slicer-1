@@ -4,6 +4,7 @@ import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.types.ClassLoaderReference;
 
 /**
+ * This class represents the four keys the classpath entries can be mapped to.
  * @author IShowerNaked
  */
 public enum ClasspathLoader {

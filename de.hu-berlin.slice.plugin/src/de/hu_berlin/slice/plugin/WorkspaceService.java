@@ -9,8 +9,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 /**
- * @author IShowerNaked
  * Service Class to get all the needed Information regarding the workspace.
+ * @author IShowerNaked
  */
 @Singleton
 public class WorkspaceService {
@@ -18,7 +18,7 @@ public class WorkspaceService {
 	/**
 	 * Returns the absolute Path.
 	 * @param path
-	 * @return
+	 * @return the 
 	 */
     public IPath getAbsolutePath(IPath path) {
 

@@ -19,8 +19,8 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectContextFactoryException;
 
 /**
- * @author IShowerNaked
  * Represents the creating process of the editor context.
+ * @author IShowerNaked
  */
 @SuppressWarnings("restriction")
 public class EditorContextFactory {

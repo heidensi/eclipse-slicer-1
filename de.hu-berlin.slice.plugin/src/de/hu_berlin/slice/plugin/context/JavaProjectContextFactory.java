@@ -9,9 +9,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 /**
- * @author IShowerNaked
  * Extracts the needed Information about the Java Project either from an ICompliationUnit, IProject
  * or IJavaProject.
+ * @author IShowerNaked
  */
 public class JavaProjectContextFactory {
 
@@ -83,7 +83,7 @@ public class JavaProjectContextFactory {
     /**
      * Creates the JavaProjectContext.
      * @param javaProject
-     * @return JavaProjectContext
+     * @return JavaProjectContext 
      */
     public JavaProjectContext create(IJavaProject javaProject) {
 

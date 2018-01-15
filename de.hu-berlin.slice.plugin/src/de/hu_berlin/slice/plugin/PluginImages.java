@@ -9,8 +9,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import de.hu_berlin.slice.Activator;
 
 /**
- * @author IShowerNaked
  * Utility class to create the images shown in the UI.
+ * @author IShowerNaked
  */
 public class PluginImages
 {

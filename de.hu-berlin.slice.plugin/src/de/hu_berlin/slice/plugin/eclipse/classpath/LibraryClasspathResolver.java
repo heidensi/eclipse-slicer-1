@@ -18,6 +18,7 @@ import com.ibm.wala.classLoader.Module;
 import de.hu_berlin.slice.plugin.WorkspaceService;
 
 /**
+ * Utility class to resolve a library classpath entry.
  * @author IShowerNaked
  */
 @Singleton

@@ -33,8 +33,8 @@ import com.ibm.wala.types.ClassLoaderReference;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
+ * Task where the call graph gets build. 
  * @author IShowerNaked
- * Task where the slicing happens.
  */
 public class EntrypointLocatorTask implements ITask {
 

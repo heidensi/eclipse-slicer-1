@@ -8,8 +8,8 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
- * @author IShowerNaked
  * Represents all the necessary Information to run the Slice.
+ * @author IShowerNaked
  */
 public class SlicingContext {
 

@@ -21,7 +21,8 @@ public class MarkerFactory {
 	
 	/**
 	 * Creates a new marker type.
-	 * @param res
+	 * @param res 
+	 * active editor window.
 	 * @return marker
 	 * @throws CoreException
 	 */
@@ -36,7 +37,9 @@ public class MarkerFactory {
 	/**
 	 * Adds a single marker to the given line number.
 	 * @param res
+	 * active editor window.
 	 * @param linenumber
+	 * a line number from the editor.
 	 * @return marker
 	 * @throws CoreException
 	 */
@@ -52,8 +55,11 @@ public class MarkerFactory {
 	/**
 	 * Highlights a line and adds a marker.
 	 * @param res
+	 * active editor window
 	 * @param offset
+	 * the indenting of the statement
 	 * @param length
+	 * of the statement
 	 * @return marker
 	 * @throws CoreException
 	 */
@@ -70,6 +76,7 @@ public class MarkerFactory {
 	/**
 	 * Finds all the markers directly linked to the resource.
 	 * @param resource
+	 * active editor window
 	 * @return a list of all the markers
 	 */
 	public static List<IMarker> findMarkers(IResource resource) {
@@ -83,6 +90,7 @@ public class MarkerFactory {
 	/**
 	 * Finds all the markers related to this resource or sub-resource.
 	 * @param resource
+	 * active editor window
 	 * @return a list of all the markers
 	 */
 	public static List<IMarker> findAllMarkers(IResource resource) {
@@ -95,7 +103,7 @@ public class MarkerFactory {
 	
 	/**
 	 * Returns the selection of the package explorer.
-	 * @return
+	 * @return selection
 	 */
 	public static TreeSelection getTreeSelection() {
 
