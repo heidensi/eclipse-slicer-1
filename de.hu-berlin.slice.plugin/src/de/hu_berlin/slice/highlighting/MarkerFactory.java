@@ -11,9 +11,21 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.PlatformUI;
 
+/**
+ * Class to create a highlighted line and the corresponding marker on the left side 
+ */
+
 public class MarkerFactory {
 
 	public static final String MARKER = "de.hu_berlin.slice.marker.slicer";
+	
+	/**
+	 * Creates a new marker type.
+	 * @param res 
+	 * active editor window.
+	 * @return marker
+	 * @throws CoreException
+	 */
 
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
@@ -22,8 +34,16 @@ public class MarkerFactory {
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		return marker;
 	}
-
-	//does not color the line, just adds a marker on the left side
+	
+	/**
+	 * Adds a single marker to the given line number.
+	 * @param res
+	 * active editor window.
+	 * @param linenumber
+	 * a line number from the editor.
+	 * @return marker
+	 * @throws CoreException
+	 */
 	public static IMarker createMarker(IResource res, int linenumber) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
@@ -32,7 +52,18 @@ public class MarkerFactory {
 		marker.setAttribute(IMarker.LINE_NUMBER, linenumber);
 		return marker;
 	}
-
+	
+	/**
+	 * Highlights a line and adds a marker.
+	 * @param res
+	 * active editor window
+	 * @param offset
+	 * the indenting of the statement
+	 * @param length
+	 * of the statement
+	 * @return marker
+	 * @throws CoreException
+	 */
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
@@ -43,7 +74,12 @@ public class MarkerFactory {
 		return marker;
 	}
 
-
+	/**
+	 * Finds all the markers directly linked to the resource.
+	 * @param resource
+	 * active editor window
+	 * @return a list of all the markers
+	 */
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_ZERO));
@@ -51,7 +87,13 @@ public class MarkerFactory {
 			return new ArrayList<IMarker>();
 		}
 	}
-
+	
+	/**
+	 * Finds all the markers related to this resource or sub-resource.
+	 * @param resource
+	 * active editor window
+	 * @return a list of all the markers
+	 */
 	public static List<IMarker> findAllMarkers(IResource resource) {
 		try {
 			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE));
@@ -59,7 +101,11 @@ public class MarkerFactory {
 			return new ArrayList<IMarker>();
 		}
 	}
-
+	
+	/**
+	 * Returns the selection of the package explorer.
+	 * @return selection
+	 */
 	public static TreeSelection getTreeSelection() {
 
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()

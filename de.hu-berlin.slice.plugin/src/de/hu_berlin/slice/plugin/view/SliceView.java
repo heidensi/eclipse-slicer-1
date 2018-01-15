@@ -55,7 +55,6 @@ import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
- *
  * @author IShowerNaked
  */
 public class SliceView extends ViewPart {
@@ -138,7 +137,8 @@ public class SliceView extends ViewPart {
         manager.add(clearViewAction);
         manager.add(refreshViewAction);
     }
-
+    
+    //Buttons get specified 
     private void configureActions() {
 
         //
@@ -190,9 +190,11 @@ public class SliceView extends ViewPart {
     // Action implementations.
     //
 
+    //Forward Slice
+    //Highlights random lines (at the moment)
     private void jobDemo() {
-//        Job job = Job.create("ok", new CompilationJob());
-//        job.schedule();
+    		//Job job = Job.create("ok", new CompilationJob());
+    		//job.schedule();
         Highlighting h = new Highlighting();
         try {
 			h.deleteMarkers();
@@ -208,6 +210,7 @@ public class SliceView extends ViewPart {
     }
 
     /**
+     * Backward Slice
      * Demo, wrong place :)
      */
     private void demo() {
@@ -215,9 +218,11 @@ public class SliceView extends ViewPart {
         List<String> out = new ArrayList<>();
 
         try {
-
+        
             EditorContext editorContext = editorContextFactory.create(workbench);
 
+            
+            //
             ITextSelection    textSelection     = editorContext.getTextSelection();
             ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
             IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();

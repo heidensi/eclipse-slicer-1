@@ -3,6 +3,7 @@ package de.hu_berlin.slice.plugin.eclipse.classpath;
 import org.eclipse.jdt.core.IJavaProject;
 
 /**
+ * Represents the way the classpath should be resolved. Either Binary or Source.
  * @author IShowerNaked
  */
 public class ClasspathScope {

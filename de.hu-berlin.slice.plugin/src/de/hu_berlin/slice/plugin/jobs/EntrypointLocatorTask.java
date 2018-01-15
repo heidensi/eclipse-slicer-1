@@ -33,6 +33,7 @@ import com.ibm.wala.types.ClassLoaderReference;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 
 /**
+ * Task where the call graph gets build. 
  * @author IShowerNaked
  */
 public class EntrypointLocatorTask implements ITask {
@@ -55,6 +56,8 @@ public class EntrypointLocatorTask implements ITask {
             for (IClassLoader cl : classHierarchy.getLoaders()) {
                 System.err.println(cl.getClass().getName());
             }
+
+            //Iterate through all Application modules to collect the entrypoints.
             IClassLoader classLoader = classHierarchy.getLoader(ClassLoaderReference.Application);
 
             List<Entrypoint> entrypoints = new ArrayList<>();
@@ -69,7 +72,7 @@ public class EntrypointLocatorTask implements ITask {
                     entrypoints.add(entrypoint);
                 }
             }
-
+            
             AnalysisOptions options = new AnalysisOptions(context.analysisScope, entrypoints);
 
             // TODO: not sure what exactly this is for, but it seems to place a LambdaMethodTargetSelector to `options`. we must understand this sooner or later...

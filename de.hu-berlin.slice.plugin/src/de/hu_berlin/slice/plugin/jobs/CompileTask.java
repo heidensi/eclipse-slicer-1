@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
+ * Task to Compile the Project.
  * @author IShowerNaked
  */
 class CompileTask implements ITask {

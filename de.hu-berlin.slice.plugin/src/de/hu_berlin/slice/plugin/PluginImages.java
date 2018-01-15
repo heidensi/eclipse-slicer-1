@@ -9,6 +9,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import de.hu_berlin.slice.Activator;
 
 /**
+ * Utility class to create the images shown in the UI.
  * @author IShowerNaked
  */
 public class PluginImages
@@ -20,10 +21,11 @@ public class PluginImages
     public static final ImageDescriptor DESC_RUN_FORWARD  = createImageDescriptor("run_forward.png");
     public static final ImageDescriptor DESC_UPDATE       = createImageDescriptor("update.png");
 
-    //
-    // Utility methods.
-    //
-
+    /**
+     * Creates the images shown in the UI.
+     * @param fileName
+     * @return
+     */
     private static ImageDescriptor createImageDescriptor(String fileName) {
         String path = PATH_TO_ICONS + fileName;
         URL fileURL = FileLocator.find(Activator.getDefault().getBundle(), new Path(path), null);

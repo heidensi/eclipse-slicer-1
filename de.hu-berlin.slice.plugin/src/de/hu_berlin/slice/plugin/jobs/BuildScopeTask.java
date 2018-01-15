@@ -10,10 +10,11 @@ import de.hu_berlin.slice.plugin.AnalysisScopeFactory;
 import de.hu_berlin.slice.plugin.BundleService;
 
 /**
+ * Represents a Task creating an AnalysisScope and adding it to the Slicing Context.
  * @author IShowerNaked
  */
 class BuildScopeTask implements ITask {
-
+	
     @Inject
     AnalysisScopeFactory analysisScopeFactory;
 
@@ -27,6 +28,7 @@ class BuildScopeTask implements ITask {
         File exclusionsFile = null;
         try {
             exclusionsFile = bundleService.getFileByPath("dat/Java60RegressionExclusions.txt");
+            
             context.analysisScope = analysisScopeFactory.create(context.getJavaProject(), exclusionsFile);
         } catch (Exception e) {
             throw new TaskException(null, e);

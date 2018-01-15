@@ -13,8 +13,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+/**
+ * Class determines which lines should be highlighted.
+ */
+
 public class Highlighting {
 
+	/**
+	 * Highlights the given Section of the marked text.
+	 * @param textSelection 
+	 * the selected text in the editor
+	 * @throws CoreException
+	 */
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -25,6 +35,13 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	/**
+	 * Highlights a Line according to a given line number.
+	 * @param linenumber
+	 * line number from the editor
+	 * @throws CoreException
+	 * @throws BadLocationException
+	 */
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -40,6 +57,11 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+	/**
+	 * Highlights random lines in the Editor.
+	 * @throws CoreException
+	 * @throws BadLocationException
+	 */
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
 
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
@@ -59,12 +81,17 @@ public class Highlighting {
     		HighlightLine(colrThisLine);
 		}
 	}
-
+	
+	
+	/**
+	 * Deletes all the highlights and markers linked directly to the resource.
+	 * @throws CoreException
+	 */
 	public void deleteMarkers() throws CoreException {
 		
 		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
 				.getEditorInput().getAdapter(IFile.class);
-
+		
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
 		for (IMarker marker : markers) {
 			marker.delete();

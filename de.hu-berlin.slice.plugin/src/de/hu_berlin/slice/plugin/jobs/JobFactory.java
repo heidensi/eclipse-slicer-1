@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.google.inject.Injector;
 
 /**
+ * Represents a class controlling and monitoring the different steps to compute the slice.
  * @author IShowerNaked
  */
 @Singleton
@@ -21,7 +22,12 @@ public class JobFactory {
 
     @Inject
     Injector injector;
-
+    
+    /**
+     * Creates and runs the different steps to compute the slice.
+     * @param slicing context
+     * @return
+     */
     public Job create(SlicingContext context) {
 
         List<ITask> tasks = new ArrayList<>(Arrays.asList(

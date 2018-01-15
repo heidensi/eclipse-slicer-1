@@ -1,6 +1,7 @@
 package de.hu_berlin.slice.plugin.jobs;
 
 /**
+ * Exception for a slicing failure.
  * @author IShowerNaked
  */
 class TaskException extends Exception {

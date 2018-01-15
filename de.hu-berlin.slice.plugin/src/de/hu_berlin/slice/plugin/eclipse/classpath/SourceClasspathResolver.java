@@ -18,6 +18,7 @@ import com.ibm.wala.classLoader.SourceDirectoryTreeModule;
 import de.hu_berlin.slice.plugin.WorkspaceService;
 
 /**
+ * Utility class to resolve a source classpath entry.
  * @author IShowerNaked
  */
 @Singleton
@@ -25,7 +26,7 @@ public class SourceClasspathResolver implements IClasspathResolver {
 
     @Inject
     WorkspaceService workspaceService;
-
+    
     @Override
     public Map.Entry<ClasspathLoader, Module> resolve(ClasspathScope scope, IClasspathEntry classpathEntry) throws Exception {
 
@@ -34,7 +35,7 @@ public class SourceClasspathResolver implements IClasspathResolver {
         }
         return resolveForBinary(scope, classpathEntry);
     }
-
+    
     private Map.Entry<ClasspathLoader, Module> resolveForSource(ClasspathScope scope, IClasspathEntry classpathEntry) {
 
         File srcDirectory = workspaceService.getAbsolutePath(classpathEntry.getPath()).toFile();

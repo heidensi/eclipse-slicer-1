@@ -19,6 +19,7 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectContextFactoryException;
 
 /**
+ * Represents the creating process of the editor context.
  * @author IShowerNaked
  */
 @SuppressWarnings("restriction")
@@ -34,6 +35,7 @@ public class EditorContextFactory {
     JavaProjectContextFactory javaProjectContextFactory;
 
     /**
+     * Represents the collected information from the workbench.
      * @author IShowerNaked
      */
     public class EditorContext {
@@ -51,7 +53,9 @@ public class EditorContextFactory {
         private Statement statementNode;
 
         private MethodDeclaration methodDeclaration;
-
+        
+        
+        
         public ASTNode getAST() {
             return ast;
         }
@@ -80,7 +84,10 @@ public class EditorContextFactory {
             return statementNode;
         }
     }
-
+    
+    /**
+     *Exception for the failure of creating the editor context.
+     */
     public class EditorContextFactoryException extends Exception {
 
         private static final long serialVersionUID = 1L;
@@ -90,6 +97,12 @@ public class EditorContextFactory {
         }
     }
 
+    /**
+     * Extracts and returns the needed Information from the workbench
+     * @param workbench
+     * @return editor context
+     * @throws EditorContextFactoryException
+     */
     public EditorContext create(IWorkbench workbench) throws EditorContextFactoryException {
 
         IEditorPart editorPart = eclipseService.getActiveEditor(workbench);
@@ -125,7 +138,7 @@ public class EditorContextFactory {
         }
 
         ASTNode ast = astService.createAST(compilationUnit);
-
+        
         Statement statementNode = astService.findStatementNodeForSelection(ast, textSelection);
         if (null == statementNode) {
             throw new EditorContextFactoryException("The text selection does not belong to a statement node.", null);
