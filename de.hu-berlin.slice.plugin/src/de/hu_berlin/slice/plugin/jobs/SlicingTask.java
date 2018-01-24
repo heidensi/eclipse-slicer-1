@@ -48,7 +48,7 @@ public class SlicingTask implements ITask {
             for (CGNode mainNode : mainMethods) {
             		System.out.println(mainNode.toString()+ " main method");
                 Statement statement = findCallTo(mainNode, "println");
-                testStatement(mainNode);
+               // testStatement(mainNode);
                 
                 if (statement == null) {
                     System.err.println("failed to find call to " + "println" + " in " + mainNode);
@@ -96,7 +96,6 @@ public class SlicingTask implements ITask {
         Atom name = Atom.findOrCreateUnicodeAtom("main");
         List<CGNode> result = new ArrayList<>();
         for (Iterator<? extends CGNode> it = cg.getSuccNodes(cg.getFakeRootNode()); it.hasNext();) {
-        	System.out.println("lol");
             CGNode n = it.next();
             if (n.getMethod().getName().equals(name)) {
                 result.add(n);
@@ -117,9 +116,9 @@ public class SlicingTask implements ITask {
             SSAInstruction s = it.next();
             if (s instanceof com.ibm.wala.ssa.SSAAbstractInvokeInstruction) {
 	            com.ibm.wala.ssa.SSAAbstractInvokeInstruction call = (com.ibm.wala.ssa.SSAAbstractInvokeInstruction) s;
-	            System.out.println("Komischer string " + n.toString().substring(0, 20) + " "
+	            //System.out.println("Komischer string " + n.toString().substring(0, 20) + " "
 	                    + call.getCallSite().getDeclaredTarget().getName().toString());
-	            System.out.println(call.getCallSite().getDeclaredTarget().getName().toString());
+	            //System.out.println(call.getCallSite().getDeclaredTarget().getName().toString());
             }
             if(s instanceof com.ibm.wala.ssa.SSAAbstractBinaryInstruction) {
         			com.ibm.wala.ssa.SSAAbstractBinaryInstruction bin = (com.ibm.wala.ssa.SSAAbstractBinaryInstruction) s;
@@ -135,7 +134,7 @@ public class SlicingTask implements ITask {
             SSAInstruction s = it.next();
             if (s instanceof com.ibm.wala.ssa.SSAAbstractInvokeInstruction) {
                 com.ibm.wala.ssa.SSAAbstractInvokeInstruction call = (com.ibm.wala.ssa.SSAAbstractInvokeInstruction) s;
-                System.out.println(n.toString().substring(0, 20) + " "
+                //System.out.println(n.toString().substring(0, 20) + " "
                         + call.getCallSite().getDeclaredTarget().getName().toString());
                 if (call.getCallSite().getDeclaredTarget().getName().toString().equals(methodName)) {
       
