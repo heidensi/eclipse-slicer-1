@@ -117,7 +117,7 @@ public class SlicingTask implements ITask {
             if (s instanceof com.ibm.wala.ssa.SSAAbstractInvokeInstruction) {
 	            com.ibm.wala.ssa.SSAAbstractInvokeInstruction call = (com.ibm.wala.ssa.SSAAbstractInvokeInstruction) s;
 	            //System.out.println("Komischer string " + n.toString().substring(0, 20) + " "
-	                    + call.getCallSite().getDeclaredTarget().getName().toString());
+	             //       + call.getCallSite().getDeclaredTarget().getName().toString());
 	            //System.out.println(call.getCallSite().getDeclaredTarget().getName().toString());
             }
             if(s instanceof com.ibm.wala.ssa.SSAAbstractBinaryInstruction) {
