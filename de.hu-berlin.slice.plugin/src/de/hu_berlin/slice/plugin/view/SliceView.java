@@ -148,6 +148,20 @@ public class SliceView extends ViewPart {
         clearViewAction.setText("Clear");
         clearViewAction.setToolTipText("Clears the slice result view.");
         clearViewAction.setImageDescriptor(PluginImages.DESC_CLEAR);
+        
+        clearViewAction = new Action() {
+            @Override
+            public void run() {
+            		Highlighting h = new Highlighting();
+            			try {
+							h.deleteMarkers();
+						} catch (CoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+            		
+            }
+        };
 
         //
         // Action to refresh the view.
@@ -165,7 +179,7 @@ public class SliceView extends ViewPart {
         sliceBackwardAction = new Action() {
             @Override
             public void run() {
-                demo(); // demo
+                slice(false); // demo
             }
         };
         sliceBackwardAction.setText("Slice backwards");
@@ -178,7 +192,7 @@ public class SliceView extends ViewPart {
         sliceForwardAction = new Action() {
             @Override
             public void run() {
-                jobDemo(); // demo
+            		slice(true); // demo
             }
         };
         sliceForwardAction.setText("Slice forward");
@@ -190,30 +204,10 @@ public class SliceView extends ViewPart {
     // Action implementations.
     //
 
-    //Forward Slice
-    //Highlights random lines (at the moment)
-    private void jobDemo() {
-    		//Job job = Job.create("ok", new CompilationJob());
-    		//job.schedule();
-        Highlighting h = new Highlighting();
-        try {
-			h.deleteMarkers();
-	        h.HighlightRandomLines();
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadLocationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-    }
-
     /**
-     * Backward Slice
-     * Demo, wrong place :)
+	 * demo for slicing
      */
-    private void demo() {
+    private void slice(boolean sliceType) {
 
         List<String> out = new ArrayList<>();
 
@@ -244,17 +238,24 @@ public class SliceView extends ViewPart {
             h.deleteMarkers();
             h.HighlightSelected(textSelection);
             
-            SlicingContext slicingContext = new SlicingContext(editorContext);
+            SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
 
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
                 @Override
                 public void done(IJobChangeEvent event) {
-                    // System.err.println(slicingContext.getClassHierarchy().toString());
+                    try {
+						for(int i : slicingContext.getList()) {
+							h.HighlightLine(i);
+						}
+					} catch (CoreException | BadLocationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 }
             });
             mainJob.schedule();
-
+            
 //                // "LMainlol"
 //                Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(analysisScope, classHierarchy);
 //

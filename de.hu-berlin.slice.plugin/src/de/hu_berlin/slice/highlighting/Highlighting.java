@@ -25,10 +25,15 @@ public class Highlighting {
 	 * the selected text in the editor
 	 * @throws CoreException
 	 */
+	IFile file;
+	
+	public Highlighting() {
+		
+		 file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
+					.getEditorInput().getAdapter(IFile.class);
+	}
+	
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
-
-		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-				.getEditorInput().getAdapter(IFile.class);
 
 		int offset = textSelection.getOffset();
 		int length = textSelection.getLength();
@@ -44,8 +49,6 @@ public class Highlighting {
 	 */
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
-		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-				.getEditorInput().getAdapter(IFile.class);
 		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		provider.connect(file);
@@ -64,8 +67,7 @@ public class Highlighting {
 	 */
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
 
-		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-				.getEditorInput().getAdapter(IFile.class);
+		
 		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		provider.connect(file);
@@ -89,8 +91,6 @@ public class Highlighting {
 	 */
 	public void deleteMarkers() throws CoreException {
 		
-		IFile file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-				.getEditorInput().getAdapter(IFile.class);
 		
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
 		for (IMarker marker : markers) {

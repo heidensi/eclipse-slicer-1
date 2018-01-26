@@ -34,7 +34,8 @@ public class JobFactory {
             injector.getInstance(CompileTask.class),
             injector.getInstance(BuildScopeTask.class),
             injector.getInstance(ClassHierarchyTask.class),
-            injector.getInstance(EntrypointLocatorTask.class)
+            injector.getInstance(EntrypointLocatorTask.class),
+            injector.getInstance(SlicingTask.class)
         ));
 
         return Job.create("Trying hard", monitor -> {
