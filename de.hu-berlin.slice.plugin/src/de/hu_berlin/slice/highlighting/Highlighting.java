@@ -13,6 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+
 /**
  * Class determines which lines should be highlighted.
  */
@@ -40,6 +41,7 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+
 	/**
 	 * Highlights a Line according to a given line number.
 	 * @param linenumber
@@ -60,6 +62,7 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 	
+  
 	/**
 	 * Highlights random lines in the Editor.
 	 * @throws CoreException

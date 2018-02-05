@@ -137,8 +137,8 @@ public class SliceView extends ViewPart {
         manager.add(clearViewAction);
         manager.add(refreshViewAction);
     }
-    
-    //Buttons get specified 
+
+    //buttons get specified
     private void configureActions() {
 
         //
@@ -212,7 +212,7 @@ public class SliceView extends ViewPart {
         List<String> out = new ArrayList<>();
 
         try {
-        
+          
             EditorContext editorContext = editorContextFactory.create(workbench);
 
             
@@ -224,6 +224,7 @@ public class SliceView extends ViewPart {
             Statement         statementNode     = editorContext.getStatementNode();
             MethodDeclaration methodDeclaration = editorContext.getMethodDeclaration();
 
+            //Print information about editor context to console
             out.add("Compilation unit: "                 + compilationUnit.getSource());
             out.add("Text selected: "                    + textSelection.getText());
             out.add("- offset: "                         + textSelection.getOffset());
@@ -234,6 +235,7 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
             
+            //Highlight selected text
             Highlighting h = new Highlighting();
             h.deleteMarkers();
             h.HighlightSelected(textSelection);

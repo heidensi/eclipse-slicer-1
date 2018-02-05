@@ -48,6 +48,7 @@ import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Task where the call graph gets build. 
  * @author IShowerNaked
+ * Task where the slicing happens
  */
 public class EntrypointLocatorTask implements ITask {
 

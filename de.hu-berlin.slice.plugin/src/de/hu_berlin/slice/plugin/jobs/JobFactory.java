@@ -16,6 +16,8 @@ import com.google.inject.Injector;
 /**
  * Represents a class controlling and monitoring the different steps to compute the slice.
  * @author IShowerNaked
+ * 
+ * Separates the slice into several tasks.
  */
 @Singleton
 public class JobFactory {
