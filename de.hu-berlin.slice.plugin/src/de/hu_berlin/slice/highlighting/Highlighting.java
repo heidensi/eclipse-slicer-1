@@ -20,20 +20,22 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 public class Highlighting {
 
-	/**
-	 * Highlights the given Section of the marked text.
-	 * @param textSelection 
-	 * the selected text in the editor
-	 * @throws CoreException
-	 */
 	IFile file;
 	
 	public Highlighting() {
 		
 		 file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
 					.getEditorInput().getAdapter(IFile.class);
+		 
 	}
 	
+	
+	/**
+	 * Highlights the given Section of the marked text.
+	 * @param textSelection 
+	 * the selected text in the editor
+	 * @throws CoreException
+	 */
 	public void HighlightSelected(ITextSelection textSelection) throws CoreException {
 
 		int offset = textSelection.getOffset();
@@ -51,7 +53,6 @@ public class Highlighting {
 	 */
 	public void HighlightLine(int linenumber) throws CoreException, BadLocationException {
 
-		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		provider.connect(file);
 		IDocument  document = provider.getDocument(file);
@@ -69,8 +70,6 @@ public class Highlighting {
 	 * @throws BadLocationException
 	 */
 	public void HighlightRandomLines() throws CoreException, BadLocationException {
-
-		
 		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		provider.connect(file);
@@ -93,7 +92,6 @@ public class Highlighting {
 	 * @throws CoreException
 	 */
 	public void deleteMarkers() throws CoreException {
-		
 		
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
 		for (IMarker marker : markers) {

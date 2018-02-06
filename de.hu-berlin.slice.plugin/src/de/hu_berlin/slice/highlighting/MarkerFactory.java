@@ -26,8 +26,6 @@ public class MarkerFactory {
 	 * @return marker
 	 * @throws CoreException
 	 */
-
-	//creating the new marker type
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("de.hu_berlin.slice.marker.slicer"); //ID from the plugin.xml
@@ -65,8 +63,6 @@ public class MarkerFactory {
 	 * @return marker
 	 * @throws CoreException
 	 */
-
-
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
 		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
@@ -110,7 +106,6 @@ public class MarkerFactory {
 	 * Returns the selection of the package explorer.
 	 * @return selection
 	 */
-
 	public static TreeSelection getTreeSelection() {
 
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService()

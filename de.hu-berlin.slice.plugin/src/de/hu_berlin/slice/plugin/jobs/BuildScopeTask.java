@@ -12,9 +12,6 @@ import de.hu_berlin.slice.plugin.BundleService;
 /**
  * Represents a Task creating an AnalysisScope and adding it to the Slicing Context.
  * @author IShowerNaked
- * Task to build the Analysis Scope and add it to the SlicingContext.
- * Calls AnalysisScopeFactory
- * Throws TaskException if it fails
  */
 class BuildScopeTask implements ITask {
 	

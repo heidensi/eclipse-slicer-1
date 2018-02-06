@@ -27,11 +27,6 @@ import de.hu_berlin.slice.plugin.eclipse.classpath.SourceClasspathResolver;
 
 
 @Singleton
-
-/**
- * Creates the Analysis Scope, which is then added to the SlicingContext
- * An AnalysisScope specifies the application and library code to be analyzed.
- */
 public class AnalysisScopeFactory {
 
     @Inject
@@ -43,10 +38,9 @@ public class AnalysisScopeFactory {
     public final static String SYNTHETIC_J2SE_MODEL = "dat/SyntheticJ2SEModel.txt";
 
     /**
-
      * Creates an AnalysisScope.
      * @param javaProject
-     * current java project
+     * the current java project
      * @param exclusionsFile
      * XML-based file, which tells WALA to ignore certain classes or packages
      * @return analysisScope

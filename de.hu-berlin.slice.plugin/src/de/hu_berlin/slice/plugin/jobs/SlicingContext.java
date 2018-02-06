@@ -15,8 +15,6 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 /**
  * Represents all the necessary Information to run the Slice.
  * @author IShowerNaked
- * 
- * Collects all the necessary information needed to run the slice
  */
 public class SlicingContext {
 
@@ -41,7 +39,6 @@ public class SlicingContext {
         
     }
 
-    //GETTER-Methods
     public IJavaProject getJavaProject() {
         return editorContext.getJavaProjectContext().getJavaProject();
     }

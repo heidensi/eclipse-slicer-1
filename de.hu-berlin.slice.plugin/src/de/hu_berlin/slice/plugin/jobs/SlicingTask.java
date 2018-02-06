@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import com.ibm.wala.classLoader.ShrikeBTMethod;
 import com.ibm.wala.ipa.callgraph.CGNode;
-import com.ibm.wala.ipa.callgraph.CallGraph;
 import com.ibm.wala.ipa.slicer.NormalStatement;
 import com.ibm.wala.ipa.slicer.Slicer;
 import com.ibm.wala.ipa.slicer.Slicer.ControlDependenceOptions;
@@ -17,14 +14,10 @@ import com.ibm.wala.ipa.slicer.Slicer.DataDependenceOptions;
 import com.ibm.wala.ipa.slicer.Statement;
 import com.ibm.wala.ipa.slicer.thin.ThinSlicer;
 import com.ibm.wala.ssa.IR;
-import com.ibm.wala.ssa.SSABinaryOpInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
-
+import com.ibm.wala.util.CancelException;
 import com.ibm.wala.util.debug.Assertions;
 import com.ibm.wala.util.strings.Atom;
-
-import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
-import de.hu_berlin.slice.highlighting.Highlighting;
 
 /**
  * Task to compute the slice. 
@@ -37,97 +30,67 @@ public class SlicingTask implements ITask {
         monitor.subTask("computing the slice...");
         
         try {
-
-            List<CGNode> mainMethods = findMainMethods(context.callGraph);
-            
-            //LISTEN FÜR DIE ZEILEN
-            List<Integer> k = new ArrayList<Integer>();
-            
-            
-            
-            for (CGNode mainNode : mainMethods) {
-            		System.out.println(mainNode.toString()+ " main method");
-                Statement statement = findCallTo(mainNode, "println");
-               // testStatement(mainNode);
-                
-                if (statement == null) {
-                    System.err.println("failed to find call to " + "println" + " in " + mainNode);
-                    continue;
-                }
-                
+        			Statement statement = getStatement(context);
+        		
                 if(context.sliceType == true) {
-                		//compute forward Slice
-                		Collection<Statement> slice;
-                		slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
-                 	k = dumpSlice(slice);
-                 	System.out.println("Zurückgegebene Zeilennummern: forward Slice");
-                 	for(int i : k) {
-                 		System.out.println("Line number: "+ i);
-                 	}	
-                 	context.list = k;
+                		forwardSlice(statement, context);
                 }else {
-                		//compute backward Slice
-            			Collection<Statement> slice;
-            			slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
-            			k = dumpSlice(slice);
-            			System.out.println("Zurückgegebene Zeilennummern: backward Slice");
-            				for(int i : k) {
-            					System.out.println("Line number: "+ i);
-            				}
-            			context.list = k;
+                		backwardSlice(statement, context);
                 }
-                 /*
-              // context-sensitive thin slice
-                 ThinSlicer ts = new ThinSlicer(context.callGraph, context.pointerAnalysis);
-                 Collection<Statement> slice1 = ts.c ( statement );
-                 l = dumpSlice(slice1);
-                */
-            }
-        	
         }
         catch (Exception e) {
             throw new TaskException(null, e);
         }
-
         		monitor.done();
     		}
 	
-	public static List<CGNode> findMainMethods(CallGraph cg) {
+	
+	/**
+	 * Finds a Statement (from the SlicingContext) inside the call graph and returns it.
+	 * TODO needs to find the selected statement!
+	 * @param context
+	 * @return the Statement
+	 */
+	public Statement getStatement(SlicingContext context) {
+		List<CGNode> mainMethods = findMainMethods(context);
+		Statement statement = null;
+		for (CGNode mainNode : mainMethods) {
+    				//System.out.println(mainNode.toString()+ " main method");
+    				statement = findCallTo(mainNode, "println"); //only searches for call instructions
+    			if (statement == null) {
+    				System.err.println("failed to find call to " + "println" + " in " + mainNode);
+    				continue;
+    			}
+		}
+		return statement;
+	}
+	
+	/**
+	 * Iterates through the call graph to find the main-methods.
+	 * @param SlicingContext
+	 * @return a List of all the main-methods
+	 */
+	public static List<CGNode> findMainMethods(SlicingContext context) {
         Atom name = Atom.findOrCreateUnicodeAtom("main");
         List<CGNode> result = new ArrayList<>();
-        for (Iterator<? extends CGNode> it = cg.getSuccNodes(cg.getFakeRootNode()); it.hasNext();) {
+        for (Iterator<? extends CGNode> it = context.callGraph.getSuccNodes(context.callGraph.getFakeRootNode()); it.hasNext();) {
             CGNode n = it.next();
             if (n.getMethod().getName().equals(name)) {
                 result.add(n);
             }
         }
-
         if (result.isEmpty()) {
             Assertions.UNREACHABLE("failed to find main() method");
         }
-
         return result;
     }
-    
-	//Test
-    public static void testStatement(CGNode n) {
-    	IR ir = n.getIR();
-        for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
-            SSAInstruction s = it.next();
-            if (s instanceof com.ibm.wala.ssa.SSAAbstractInvokeInstruction) {
-	            com.ibm.wala.ssa.SSAAbstractInvokeInstruction call = (com.ibm.wala.ssa.SSAAbstractInvokeInstruction) s;
-	            //System.out.println("Komischer string " + n.toString().substring(0, 20) + " "
-	             //       + call.getCallSite().getDeclaredTarget().getName().toString());
-	            //System.out.println(call.getCallSite().getDeclaredTarget().getName().toString());
-            }
-            if(s instanceof com.ibm.wala.ssa.SSAAbstractBinaryInstruction) {
-        			com.ibm.wala.ssa.SSAAbstractBinaryInstruction bin = (com.ibm.wala.ssa.SSAAbstractBinaryInstruction) s;
-        			System.out.println(bin.getDef());
-        			System.out.println(bin.toString());
-            }
-        }
-    }
-    
+
+    /**
+     * Finds a call instruction inside the main method.
+     * @param n The call graph node of the main method
+     * @param methodName the method name of the call instruction
+     * @return a statement inside the call graph
+     */
     public static Statement findCallTo(CGNode n, String methodName) {
         IR ir = n.getIR();
         for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
@@ -149,6 +112,56 @@ public class SlicingTask implements ITask {
         return null;
     }
     
+    /**
+     * Computes the forward slice and adds the line numbers to the slicing context.
+     * @param statement
+     * @param SlicingContext
+     * @throws IllegalArgumentException
+     * @throws CancelException
+     */
+    public void forwardSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
+    		Collection<Statement> slice;
+    		slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+    		List<Integer> k = dumpSlice(slice);
+    		debugLinenumbers(k);
+    		context.list = k;
+    }
+    
+    /**
+     * Computes the backward slice and adds the line numbers to the slicing context.
+     * @param statement
+     * @param SlicingContext
+     * @throws IllegalArgumentException
+     * @throws CancelException
+     */
+    public void backwardSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
+    		Collection<Statement> slice;
+    		slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+    		List<Integer> k = dumpSlice(slice);
+    		debugLinenumbers(k);
+    		context.list = k;
+    }
+    
+    /**
+     * Computes the thin backward slice and adds the line numbers to the slicing context.
+     * @param statement
+     * @param SlicingContext
+     * @throws IllegalArgumentException
+     * @throws CancelException
+     */
+    public void thinSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
+    		ThinSlicer ts = new ThinSlicer(context.callGraph, context.pointerAnalysis);
+        Collection<Statement> slice = ts.computeBackwardThinSlice( statement );
+        List<Integer> k = dumpSlice(slice);
+        debugLinenumbers(k);
+		context.list = k;
+    }
+    
+    /**
+     * Returns the line numbers from the slice
+     * @param slice
+     * @return a List of all the line numbers from the slice
+     */
     public static List<Integer> dumpSlice(Collection<Statement> slice) {
     	List<Integer>src_test = new ArrayList<Integer>();
         for (Statement s : slice) {
@@ -163,8 +176,8 @@ public class SlicingTask implements ITask {
                         //ignore Java System Library
                         if(s.getNode().getMethod().getSignature().equals("java.lang.System.<clinit>()V")) {
                         		}else{
-                        			System.out.print(s.getNode().getMethod().getSignature());
-                        			System.out.println("Source line number = " + src_line_number);
+                        			//System.out.print(s.getNode().getMethod().getSignature());
+                        			//System.out.println("Source line number = " + src_line_number);
                         			src_test.add(src_line_number);
                         		}
                     } catch (Exception e) {
@@ -181,5 +194,16 @@ public class SlicingTask implements ITask {
         }
         return src_test;
     }
+    
+    /**
+     * Prints out all the line numbers from the slice
+     * @param k
+     */
+    public void debugLinenumbers(List<Integer> k) {
+    		for(int i : k) {
+     		System.err.println("Line number: "+ i);
+     	}
+    }
+    
 	}
 

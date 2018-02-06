@@ -21,9 +21,8 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
 /**
  * Represents the creating process of the editor context.
  * @author IShowerNaked
- * 
- * extracts the needed information about the editor from the workbench
  */
+
 @SuppressWarnings("restriction")
 public class EditorContextFactory {
 
@@ -102,6 +101,7 @@ public class EditorContextFactory {
      * @param workbench
      * @return editor context
      * @throws EditorContextFactoryException
+     */
     public EditorContext create(IWorkbench workbench) throws EditorContextFactoryException {
 
         IEditorPart editorPart = eclipseService.getActiveEditor(workbench);
@@ -128,7 +128,6 @@ public class EditorContextFactory {
 
         ITextSelection textSelection = (ITextSelection)selection;
 
-        //Calls another class to save the information about the whole Java Project (see JavaProjectContextFactory)
         JavaProjectContext javaProjectContext;
         try {
             javaProjectContext = javaProjectContextFactory.create(compilationUnit);
