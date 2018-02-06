@@ -138,7 +138,7 @@ public class SliceView extends ViewPart {
         manager.add(refreshViewAction);
     }
 
-    //buttons get specified
+    //Buttons get specified
     private void configureActions() {
 
         //
@@ -200,10 +200,6 @@ public class SliceView extends ViewPart {
         sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
     }
 
-    //
-    // Action implementations.
-    //
-
     /**
 	 * demo for slicing
      */
@@ -216,7 +212,6 @@ public class SliceView extends ViewPart {
             EditorContext editorContext = editorContextFactory.create(workbench);
 
             
-            //
             ITextSelection    textSelection     = editorContext.getTextSelection();
             ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
             IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();
@@ -224,7 +219,6 @@ public class SliceView extends ViewPart {
             Statement         statementNode     = editorContext.getStatementNode();
             MethodDeclaration methodDeclaration = editorContext.getMethodDeclaration();
 
-            //Print information about editor context to console
             out.add("Compilation unit: "                 + compilationUnit.getSource());
             out.add("Text selected: "                    + textSelection.getText());
             out.add("- offset: "                         + textSelection.getOffset());
@@ -234,8 +228,7 @@ public class SliceView extends ViewPart {
             out.add("Statement offset: "                 + statementNode.getStartPosition());
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
-            
-            //Highlight selected text
+
             Highlighting h = new Highlighting();
             h.deleteMarkers();
             h.HighlightSelected(textSelection);
@@ -257,26 +250,6 @@ public class SliceView extends ViewPart {
                 }
             });
             mainJob.schedule();
-            
-//                // "LMainlol"
-//                Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(analysisScope, classHierarchy);
-//
-//                Entrypoint demoEntrypoint = null;
-//                for (Entrypoint ep : entrypoints) {
-//                    demoEntrypoint = ep;
-//                    out.add("entrypoint: " + ep.getMethod().getSignature());
-//                    break;
-//                }
-//
-//                if (null == demoEntrypoint) {
-//                    throw new Exception("Could not determine entry point.");
-//                }
-//
-//                Set<IMethod> possibleTargets = classHierarchy.getPossibleTargets(demoEntrypoint.getMethod().getReference());
-//                out.add("Possible targets:");
-//                possibleTargets.forEach(method -> out.add(method.getName().toString()));
-//
-//                out.add(classHierarchy.toString());
         }
         catch (Exception e) {
             out.add("-- An error occured! --\n");
@@ -287,10 +260,6 @@ public class SliceView extends ViewPart {
 
         console.getDocument().set(String.join("\n", out));
     }
-
-    //
-    // Utility methods.
-    //
 
     private void alert(String msg) {
         MessageDialog.openInformation(console.getControl().getShell(), "Slice View", msg);
@@ -304,10 +273,6 @@ public class SliceView extends ViewPart {
             }
         };
     }
-
-    //
-    // Other methods.
-    //
 
     @Override
     public void setFocus() {

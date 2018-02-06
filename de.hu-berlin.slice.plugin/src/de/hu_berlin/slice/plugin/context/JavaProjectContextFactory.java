@@ -12,9 +12,6 @@ import org.eclipse.jdt.core.JavaModelException;
  * Extracts the needed Information about the Java Project either from an ICompliationUnit, IProject
  * or IJavaProject.
  * @author IShowerNaked
- * 
- * Used by EditorContextFactory to turn an ICompilationUnit into an IProject and finally return an IJavaProject 
- * 
  */
 public class JavaProjectContextFactory {
 
