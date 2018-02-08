@@ -23,6 +23,7 @@ import com.ibm.wala.ipa.callgraph.propagation.PointerAnalysis;
 import com.ibm.wala.ipa.callgraph.propagation.cfa.ZeroXCFABuilder;
 import com.ibm.wala.ipa.callgraph.propagation.cfa.ZeroXInstanceKeys;
 import com.ibm.wala.ipa.cha.ClassHierarchy;
+import com.ibm.wala.ipa.slicer.SDG;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.IR;
 import com.ibm.wala.ssa.SSABinaryOpInstruction;
@@ -94,11 +95,10 @@ public class EntrypointLocatorTask implements ITask {
      * @throws InvalidClassFileException
      */
     public void debugCallgraph(CallGraph callgraph) throws InvalidClassFileException {
+
     		for (CGNode cgEntryoint : callgraph.getEntrypointNodes()) {
             IR ir = cgEntryoint.getIR();
             IBytecodeMethod cgBytecodeEntryoint = (IBytecodeMethod)ir.getMethod();
-
-            System.err.println(cgEntryoint.getMethod().toString() + " test");
 
             int ssaInstructionIndex = -1;
             for (Iterator<SSAInstruction> iter = ir.iterateAllInstructions(); iter.hasNext();) {
