@@ -38,10 +38,17 @@ public class SlicingTask implements ITask {
         try {
         	
         			Statement statement = getStatement(context);
-                if(context.sliceType == true) {
-                		forwardSlice(statement, context);
-                }else {
-                		backwardSlice(statement, context);
+                
+                switch(context.sliceType) {
+                		case backward:
+                			backwardSlice(statement, context);
+                			break;
+                		case forward:
+                			forwardSlice(statement, context);
+                			break;
+                		case thinBackward:
+                			thinSlice(statement, context);
+                			break;
                 }
         }
         catch (Exception e) {
@@ -64,7 +71,7 @@ public class SlicingTask implements ITask {
 		
 		for (CGNode mainNode : mainMethods) {
     				//statement = findCallTo(mainNode, "println"); //only searches for call instructions
-    				statement = test(mainNode, context.editorContext.getTextSelection().getStartLine()+1);
+    				statement = findStatement(mainNode, context.editorContext.getTextSelection().getStartLine()+1);
     			if (statement == null) {
     				System.err.println("failed to find call to " + "println" + " in " + mainNode);
     				continue;
@@ -74,12 +81,12 @@ public class SlicingTask implements ITask {
 	}
 	
 	/**
-	 * Iterates through the call graph to find the methods the statement belongs to
+	 * Iterates through the call graph to find the class and the methods the statement belongs to
 	 * @param SlicingContext
 	 * @return a List of all the main-methods
 	 */
 	public  List<CGNode> findMethods(SlicingContext context) {
-		Atom aclassname = Atom.findOrCreateUnicodeAtom(ssplit(context.editorContext.getTextEditor().getTitle())); //class the statement belongs to
+		Atom aclassname = Atom.findOrCreateUnicodeAtom(stringSplit(context.editorContext.getTextEditor().getTitle())); //class the statement belongs to
         Atom name = Atom.findOrCreateUnicodeAtom(context.editorContext.getMethodDeclaration().getName().toString()); //method the statement belongs to
         List<CGNode> result = new ArrayList<>();
         for (Iterator<? extends CGNode> it = context.callGraph.getSuccNodes(context.callGraph.getFakeRootNode()); it.hasNext();) {
@@ -125,33 +132,21 @@ public class SlicingTask implements ITask {
     }
     
     /**
-     *Test     
+     * Finds the selected statement inside the call graph     
      * @param n The call graph node of the main method
-     * @param methodName the method name of the call instruction
+     * @param l the line number of the selected statement
      * @return a statement inside the call graph
      * @throws InvalidClassFileException 
      */
-    public static Statement test(CGNode n, int l) throws InvalidClassFileException {
+    public static Statement findStatement(CGNode n, int l) throws InvalidClassFileException {
         IR ir = n.getIR();
         IBytecodeMethod method = (IBytecodeMethod)ir.getMethod();
         for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
             SSAInstruction s = it.next();
                 		int i = s.iindex;
                 		int bc = method.getBytecodeIndex(i);
-                		//System.out.println("TEST Index "+ bc + "; line " + method.getLineNumber(bc));
                     
                 		if(method.getLineNumber(bc)== l) {
-                			/*SSAInstruction a = it.next();
-                			if (a instanceof com.ibm.wala.ssa.SSAAbstractInvokeInstruction) {
-                				System.out.println("DEMO");
-                				com.ibm.wala.ssa.SSAAbstractInvokeInstruction call = (com.ibm.wala.ssa.SSAAbstractInvokeInstruction) a;
-                				if (call.getCallSite().getDeclaredTarget().getName().toString().equals("println")) {
-                				com.ibm.wala.util.intset.IntSet indices = ir.getCallInstructionIndices(call.getCallSite());
-                                com.ibm.wala.util.debug.Assertions.productionAssertion(indices.size() == 1,
-                                        "expected 1 but got " + indices.size());
-                                return new com.ibm.wala.ipa.slicer.NormalStatement(n, indices.intIterator().next());
-                				}
-                			}*/
                 			return new com.ibm.wala.ipa.slicer.NormalStatement(n, i);
                 		}
             
@@ -171,7 +166,6 @@ public class SlicingTask implements ITask {
     		Collection<Statement> slice;
     		slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
     		Map<String, List<Integer>> k = dumpSlice(slice);
-    		//debugLinenumbers(k);
     		context.map = k;
     }
     
@@ -186,7 +180,6 @@ public class SlicingTask implements ITask {
     		Collection<Statement> slice;
     		slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
     		Map<String, List<Integer>> k = dumpSlice(slice);
-    		//debugLinenumbers(k);
     		context.map = k;
     }
     
@@ -201,20 +194,17 @@ public class SlicingTask implements ITask {
     		ThinSlicer ts = new ThinSlicer(context.callGraph, context.pointerAnalysis);
         Collection<Statement> slice = ts.computeBackwardThinSlice( statement );
         Map<String, List<Integer>> k = dumpSlice(slice);
-        //debugLinenumbers(k);
 		context.map = k;
     }
     
     /**
      * Returns the line numbers from the slice
      * @param slice
-     * @return a List of all the line numbers from the slice
+     * @return a Map of all the line numbers from the slice
      */
-    public static Map<String, List<Integer>> dumpSlice(Collection<Statement> slice) {
+    public Map<String, List<Integer>> dumpSlice(Collection<Statement> slice) {
     	Map<String, List<Integer>> src = new HashMap<String, List<Integer>>();
-    	List<Integer>src_test = new ArrayList<Integer>();
         for (Statement s : slice) {
-            //System.err.println(s);
             if (s.getKind() == Statement.Kind.NORMAL) { // ignore special kinds of statements
                 int bcIndex, instructionIndex = ((NormalStatement) s).getInstructionIndex();
                 try {
@@ -231,8 +221,7 @@ public class SlicingTask implements ITask {
                         		src.put(key, a );
                         }
                         			//System.out.print(s.getNode().getMethod().getSignature());
-                        			System.err.println("Class: " +s.getNode().getMethod().getDeclaringClass().getName().getClassName() + " ;Line number: " + src_line_number);
-                        			src_test.add(src_line_number);
+                        		System.err.println("Class: " +s.getNode().getMethod().getDeclaringClass().getName().getClassName() + " ;Line number: " + src_line_number);
                     } catch (Exception e) {
                         // System.err.println("Bytecode index no good");
                         // System.err.println(e.getMessage());
@@ -245,11 +234,7 @@ public class SlicingTask implements ITask {
             }
 
         }
-        for (Map.Entry<String, List<Integer>> entry : src.entrySet())
-        {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        
+        debugLinenumbers(src);
         return src;
     }
     
@@ -258,13 +243,20 @@ public class SlicingTask implements ITask {
      * Prints out all the line numbers from the slice
      * @param k
      */
-    public void debugLinenumbers(List<Integer> k) {
-    		for(int i : k) {
-     		System.err.println("Line number: "+ i);
-     	}
+    public void debugLinenumbers(Map<String,List<Integer>> src) {
+    		for (Map.Entry<String, List<Integer>> entry : src.entrySet())
+        {
+            System.err.println(entry.getKey() + " " + entry.getValue());
+        }
     }
     
-    public String ssplit(String s) {
+    
+    /**
+     * cuts off the type extension
+     * @param String
+     * @return
+     */
+    private String stringSplit(String s) {
     		String[] segs = s.split( Pattern.quote( "." ) );
     		return segs[0];
     }

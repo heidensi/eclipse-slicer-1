@@ -30,14 +30,19 @@ public class SlicingContext {
     
     CallGraph callGraph;
     
-    boolean sliceType;
+    public enum sliceType{
+    		backward, forward, thinBackward;
+    };
+    
     
     PointerAnalysis<InstanceKey> pointerAnalysis;
     
     Map<String, List<Integer>> map;
+
+	public sliceType sliceType;
     
 
-    public SlicingContext(EditorContext editorContext, boolean b) {
+    public SlicingContext(EditorContext editorContext, sliceType b) {
         this.editorContext = editorContext;
         this.sliceType = b;
         
@@ -67,7 +72,7 @@ public class SlicingContext {
     /**
      * @return true for forward slice and false for backward slice
      */
-    public boolean getSliceType() {
+    public sliceType getSliceType() {
     		return sliceType;
     }
     

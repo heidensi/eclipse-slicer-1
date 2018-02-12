@@ -99,6 +99,8 @@ public class EntrypointLocatorTask implements ITask {
     		for (CGNode cgEntryoint : callgraph.getEntrypointNodes()) {
             IR ir = cgEntryoint.getIR();
             IBytecodeMethod cgBytecodeEntryoint = (IBytecodeMethod)ir.getMethod();
+            
+            System.err.println(cgEntryoint.getMethod().toString());
 
             int ssaInstructionIndex = -1;
             for (Iterator<SSAInstruction> iter = ir.iterateAllInstructions(); iter.hasNext();) {

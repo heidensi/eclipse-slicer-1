@@ -62,6 +62,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
 import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
@@ -198,7 +199,7 @@ public class SliceView extends ViewPart {
         sliceBackwardAction = new Action() {
             @Override
             public void run() {
-                slice(false); // demo
+                slice(sliceType.backward); // demo
             }
         };
         sliceBackwardAction.setText("Slice backwards");
@@ -211,7 +212,7 @@ public class SliceView extends ViewPart {
         sliceForwardAction = new Action() {
             @Override
             public void run() {
-            		slice(true); // demo
+            		slice(sliceType.forward); // demo
             }
         };
         sliceForwardAction.setText("Slice forward");
@@ -222,7 +223,7 @@ public class SliceView extends ViewPart {
     /**
 	 * demo for slicing
      */
-    private void slice(boolean sliceType) {
+    private void slice(sliceType sliceType) {
 
         List<String> out = new ArrayList<>();
 
@@ -248,8 +249,9 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
             
+            clearViewAction.run();
+            
             Highlighting h = new Highlighting();
-            h.deleteMarkers();
             h.HighlightSelected(textSelection);
             IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
             SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
@@ -260,7 +262,7 @@ public class SliceView extends ViewPart {
                 public void done(IJobChangeEvent event) {
                     for(IEditorReference ex : editors) {
 							//System.out.println(ex.getTitle());
-							String s = ssplit(ex.getTitle());
+							String s = stringSplit(ex.getTitle());
 							//System.out.println(s);
 							
 							if(slicingContext.getMap().containsKey(s)) {
@@ -309,7 +311,12 @@ public class SliceView extends ViewPart {
         console.getControl().setFocus();
     }
     
-    public String ssplit(String s) {
+    /**
+     * cuts off the type extension
+     * @param s
+     * @return
+     */
+    public String stringSplit(String s) {
 		String[] segs = s.split( Pattern.quote( "." ) );
 		return segs[0];
 }
