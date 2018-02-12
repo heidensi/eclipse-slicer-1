@@ -1,8 +1,12 @@
 package de.hu_berlin.slice.plugin.view;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -29,11 +33,17 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
@@ -52,6 +62,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
 import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
@@ -152,13 +163,22 @@ public class SliceView extends ViewPart {
         clearViewAction = new Action() {
             @Override
             public void run() {
-            		Highlighting h = new Highlighting();
-            			try {
-							h.deleteMarkers();
+            		IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+            		for(IEditorReference ex : editors) {
+            			Highlighting h;
+						try {
+							h = new Highlighting(ex);
+							h.deleteAllMarkers();
+						} catch (PartInitException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						} catch (CoreException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+            			
+            		}
+            		
             		
             }
         };
@@ -179,7 +199,7 @@ public class SliceView extends ViewPart {
         sliceBackwardAction = new Action() {
             @Override
             public void run() {
-                slice(false); // demo
+                slice(sliceType.backward); // demo
             }
         };
         sliceBackwardAction.setText("Slice backwards");
@@ -192,7 +212,7 @@ public class SliceView extends ViewPart {
         sliceForwardAction = new Action() {
             @Override
             public void run() {
-            		slice(true); // demo
+            		slice(sliceType.forward); // demo
             }
         };
         sliceForwardAction.setText("Slice forward");
@@ -203,7 +223,7 @@ public class SliceView extends ViewPart {
     /**
 	 * demo for slicing
      */
-    private void slice(boolean sliceType) {
+    private void slice(sliceType sliceType) {
 
         List<String> out = new ArrayList<>();
 
@@ -228,28 +248,40 @@ public class SliceView extends ViewPart {
             out.add("Statement offset: "                 + statementNode.getStartPosition());
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
-
-            Highlighting h = new Highlighting();
-            h.deleteMarkers();
-            h.HighlightSelected(textSelection);
             
+            clearViewAction.run();
+            
+            Highlighting h = new Highlighting();
+            h.HighlightSelected(textSelection);
+            IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
             SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
-
+            
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
                 @Override
                 public void done(IJobChangeEvent event) {
-                    try {
-						for(int i : slicingContext.getList()) {
-							h.HighlightLine(i);
+                    for(IEditorReference ex : editors) {
+							//System.out.println(ex.getTitle());
+							String s = stringSplit(ex.getTitle());
+							//System.out.println(s);
+							
+							if(slicingContext.getMap().containsKey(s)) {
+								for(int i :slicingContext.getMap().get(s)) {
+									try {
+										Highlighting g = new Highlighting(ex);
+										g.HighlightLine(i);
+									} catch (CoreException | BadLocationException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
 						}
-					} catch (CoreException | BadLocationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
                 }
             });
             mainJob.schedule();
+     
+            
         }
         catch (Exception e) {
             out.add("-- An error occured! --\n");
@@ -278,4 +310,14 @@ public class SliceView extends ViewPart {
     public void setFocus() {
         console.getControl().setFocus();
     }
+    
+    /**
+     * cuts off the type extension
+     * @param s
+     * @return
+     */
+    public String stringSplit(String s) {
+		String[] segs = s.split( Pattern.quote( "." ) );
+		return segs[0];
+}
 }

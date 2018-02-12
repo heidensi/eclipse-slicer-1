@@ -9,9 +9,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+
+//import de.hu_berlin.slice.plugin.view.file;
 
 
 /**
@@ -27,6 +31,10 @@ public class Highlighting {
 		 file = (IFile) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor()
 					.getEditorInput().getAdapter(IFile.class);
 		 
+	}
+	
+	public Highlighting(IEditorReference ex) throws PartInitException {
+		file = (IFile )ex.getEditorInput().getAdapter(IFile.class);
 	}
 	
 	
@@ -94,6 +102,14 @@ public class Highlighting {
 	public void deleteMarkers() throws CoreException {
 		
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
+		for (IMarker marker : markers) {
+			marker.delete();
+		}
+	}
+	
+	public void deleteAllMarkers() throws CoreException {
+		
+		List<IMarker> markers = MarkerFactory.findAllMarkers(file);
 		for (IMarker marker : markers) {
 			marker.delete();
 		}

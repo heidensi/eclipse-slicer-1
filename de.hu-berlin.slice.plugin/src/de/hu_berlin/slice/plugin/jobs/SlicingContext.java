@@ -1,6 +1,7 @@
 package de.hu_berlin.slice.plugin.jobs;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaProject;
 
@@ -17,6 +18,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
  * @author IShowerNaked
  */
 public class SlicingContext {
+	
 
     EditorContext editorContext;
 
@@ -28,12 +30,19 @@ public class SlicingContext {
     
     CallGraph callGraph;
     
-    boolean sliceType;
+    public enum sliceType{
+    		backward, forward, thinBackward;
+    };
+    
     
     PointerAnalysis<InstanceKey> pointerAnalysis;
     
+    Map<String, List<Integer>> map;
 
-    public SlicingContext(EditorContext editorContext, boolean b) {
+	public sliceType sliceType;
+    
+
+    public SlicingContext(EditorContext editorContext, sliceType b) {
         this.editorContext = editorContext;
         this.sliceType = b;
         
@@ -55,10 +64,15 @@ public class SlicingContext {
     		return list;
     }
     
+    public Map<String,List<Integer>> getMap(){
+    		return map;
+    }
+    
+    
     /**
      * @return true for forward slice and false for backward slice
      */
-    public boolean getSliceType() {
+    public sliceType getSliceType() {
     		return sliceType;
     }
     
