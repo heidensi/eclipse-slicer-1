@@ -26,6 +26,7 @@ import com.ibm.wala.ipa.cha.ClassHierarchy;
 import com.ibm.wala.ipa.slicer.SDG;
 import com.ibm.wala.shrikeCT.InvalidClassFileException;
 import com.ibm.wala.ssa.IR;
+import com.ibm.wala.ssa.ISSABasicBlock;
 import com.ibm.wala.ssa.SSABinaryOpInstruction;
 import com.ibm.wala.ssa.SSAInstruction;
 import com.ibm.wala.types.ClassLoaderReference;
@@ -102,25 +103,27 @@ public class EntrypointLocatorTask implements ITask {
             
             System.err.println(cgEntryoint.getMethod().toString());
 
-            int ssaInstructionIndex = -1;
-            for (Iterator<SSAInstruction> iter = ir.iterateAllInstructions(); iter.hasNext();) {
+            for (Iterator<ISSABasicBlock> iterBlocks = ir.getControlFlowGraph().iterator(); iterBlocks.hasNext();) {
+            	for (Iterator<SSAInstruction> iter = iterBlocks.next().iterator(); iter.hasNext();) {
 
-                SSAInstruction ssaInstruction = iter.next();
-                int bcIndex = cgBytecodeEntryoint.getBytecodeIndex(++ssaInstructionIndex);
-
-                if (-1 == bcIndex) {
-                    System.err.println("Na, damn it!");
-                }
-                else {
-                    System.err.println(String.format("Instruction Index: %d, Line number: %d, Instruction: %s", bcIndex, cgBytecodeEntryoint.getLineNumber(bcIndex), ssaInstruction.toString()));
-                }
-
-                // this demo shows how Wala aggregates multiple source lines into one SSAInstruction
-                if (ssaInstruction instanceof SSABinaryOpInstruction) {
-                    SSABinaryOpInstruction test = (SSABinaryOpInstruction)ssaInstruction;
-                    System.err.println("- Operator: " + test.getOperator() );
-                }
-                
+            		SSAInstruction ssaInstruction = iter.next();
+            		
+            		if (ssaInstruction.iindex == SSAInstruction.NO_INDEX) { //index == -1
+            			System.err.println(String.format("Instruction Index: %d, Instruction: %s", 
+            					SSAInstruction.NO_INDEX, ssaInstruction.toString()));
+            		} else {
+            			int bcIndex = cgBytecodeEntryoint.getBytecodeIndex(ssaInstruction.iindex);
+                        int lineNumber = cgBytecodeEntryoint.getLineNumber(bcIndex);
+                        
+            			System.err.println(String.format("Instruction Index: %d, Line number: %d, Instruction: %s", 
+            					ssaInstruction.iindex, lineNumber, ssaInstruction.toString()));
+            		}
+            		// this demo shows how Wala aggregates multiple source lines into one SSAInstruction
+            		if (ssaInstruction instanceof SSABinaryOpInstruction) {
+            			SSABinaryOpInstruction test = (SSABinaryOpInstruction)ssaInstruction;
+            			System.err.println("- Operator: " + test.getOperator() );
+            		}
+            	}
             }
             
         }
