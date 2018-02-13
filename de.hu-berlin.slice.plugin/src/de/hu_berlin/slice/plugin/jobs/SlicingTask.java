@@ -64,7 +64,6 @@ public class SlicingTask implements ITask {
 	
 	/**
 	 * Finds a Statement (from the SlicingContext) inside the call graph and returns it.
-	 * TODO needs to find the selected statement!
 	 * @param context
 	 * @return the Statement
 	 * @throws InvalidClassFileException 
@@ -147,10 +146,12 @@ public class SlicingTask implements ITask {
         for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
             SSAInstruction s = it.next();
                 		int i = s.iindex;
+                		if(i>=0) {
                 		int bc = method.getBytecodeIndex(i);
                     
                 		if(method.getLineNumber(bc)== l) {
                 			list.add(new com.ibm.wala.ipa.slicer.NormalStatement(n, i));
+                		}
                 		}
             
         }
