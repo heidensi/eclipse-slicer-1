@@ -155,11 +155,6 @@ public class SliceView extends ViewPart {
         //
         // Action to clear the view
         //
-        clearViewAction = createPlaceholderAction("Clear view button clicked!");
-        clearViewAction.setText("Clear");
-        clearViewAction.setToolTipText("Clears the slice result view.");
-        clearViewAction.setImageDescriptor(PluginImages.DESC_CLEAR);
-        
         clearViewAction = new Action() {
             @Override
             public void run() {
@@ -182,6 +177,9 @@ public class SliceView extends ViewPart {
             		
             }
         };
+        clearViewAction.setText("Clear");
+        clearViewAction.setToolTipText("Clears the slice result view.");
+        clearViewAction.setImageDescriptor(PluginImages.DESC_CLEAR);
 
         //
         // Action to refresh the view.
