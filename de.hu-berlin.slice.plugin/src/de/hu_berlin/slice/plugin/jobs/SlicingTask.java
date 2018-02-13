@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -31,23 +32,26 @@ import com.ibm.wala.util.strings.Atom;
  * @author MartinEberlein
  */
 public class SlicingTask implements ITask {
-	
+
+
 	@Override
     public void run(IProgressMonitor monitor, SlicingContext context) throws TaskException {
         monitor.subTask("computing the slice...");
         try {
         	
-        			Statement statement = getStatement(context);
+        			List<NormalStatement> statements = getStatements(context);
                 
                 switch(context.sliceType) {
                 		case backward:
-                			backwardSlice(statement, context);
+                			//backwardSlice(statement, context);
+                			backwardSlice(statements, context);
                 			break;
                 		case forward:
-                			forwardSlice(statement, context);
+                			//forwardSlice(statement, context);
+                			forwardSlice(statements, context);
                 			break;
                 		case thinBackward:
-                			thinSlice(statement, context);
+                			thinSlice(statements, context);
                 			break;
                 }
         }
@@ -64,20 +68,18 @@ public class SlicingTask implements ITask {
 	 * @param context
 	 * @return the Statement
 	 * @throws InvalidClassFileException 
-	 */
-	public Statement getStatement(SlicingContext context) throws InvalidClassFileException {
+	 */	
+    public List<NormalStatement> getStatements(SlicingContext context) throws InvalidClassFileException {
 		List<CGNode> mainMethods = findMethods(context);
-		Statement statement = null;
-		
+		List<NormalStatement> statements = null;
 		for (CGNode mainNode : mainMethods) {
-    				//statement = findCallTo(mainNode, "println"); //only searches for call instructions
-    				statement = findStatement(mainNode, context.editorContext.getTextSelection().getStartLine()+1);
-    			if (statement == null) {
-    				System.err.println("failed to find call to " + "println" + " in " + mainNode);
+				statements = findStatements(mainNode, context.editorContext.getTextSelection().getStartLine()+1);
+    			if (statements.isEmpty()) {
+    				System.err.println("failed to find statement in the call graph. Please select a different statement");
     				continue;
     			}
 		}
-		return statement;
+		return statements;
 	}
 	
 	/**
@@ -138,23 +140,23 @@ public class SlicingTask implements ITask {
      * @return a statement inside the call graph
      * @throws InvalidClassFileException 
      */
-    public static Statement findStatement(CGNode n, int l) throws InvalidClassFileException {
+    public static List<NormalStatement> findStatements(CGNode n, int l) throws InvalidClassFileException {
         IR ir = n.getIR();
         IBytecodeMethod method = (IBytecodeMethod)ir.getMethod();
+        List<com.ibm.wala.ipa.slicer.NormalStatement> list = new ArrayList<NormalStatement>();
         for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
             SSAInstruction s = it.next();
                 		int i = s.iindex;
                 		int bc = method.getBytecodeIndex(i);
                     
                 		if(method.getLineNumber(bc)== l) {
-                			return new com.ibm.wala.ipa.slicer.NormalStatement(n, i);
+                			list.add(new com.ibm.wala.ipa.slicer.NormalStatement(n, i));
                 		}
             
         }
-        //Assertions.UNREACHABLE("FEHLER" + n);
-        return null;
+        return list;
     }
-    
+        
     /**
      * Computes the forward slice and adds the line numbers to the slicing context.
      * @param statement
@@ -162,11 +164,17 @@ public class SlicingTask implements ITask {
      * @throws IllegalArgumentException
      * @throws CancelException
      */
-    public void forwardSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
-    		Collection<Statement> slice;
-    		slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
-    		Map<String, List<Integer>> k = dumpSlice(slice);
-    		context.map = k;
+    public void forwardSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		Collection<Statement> slice;
+		Map<String, List<Integer>> k = new HashMap<String, List<Integer>>();;
+		for(Statement statement : statements) {
+			slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+			Map<String, List<Integer>> m = dumpSlice(slice);
+			k = merge(k,m);
+		}
+		k =removeDuplicates(k);
+		context.map = k;
+		debugLinenumbers(k);
     }
     
     /**
@@ -175,12 +183,19 @@ public class SlicingTask implements ITask {
      * @param SlicingContext
      * @throws IllegalArgumentException
      * @throws CancelException
-     */
-    public void backwardSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
-    		Collection<Statement> slice;
-    		slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
-    		Map<String, List<Integer>> k = dumpSlice(slice);
-    		context.map = k;
+     */    
+    public void backwardSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		Collection<Statement> slice;
+		Map<String, List<Integer>> k = new HashMap<String, List<Integer>>();;
+		for(Statement statement : statements) {
+			slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+			Map<String, List<Integer>> m = dumpSlice(slice);
+			k = merge(k,m);
+		}
+		k =removeDuplicates(k);
+		context.map = k;
+		debugLinenumbers(k);
+		
     }
     
     /**
@@ -190,11 +205,19 @@ public class SlicingTask implements ITask {
      * @throws IllegalArgumentException
      * @throws CancelException
      */
-    public void thinSlice(Statement statement, SlicingContext context) throws IllegalArgumentException, CancelException {
-    		ThinSlicer ts = new ThinSlicer(context.callGraph, context.pointerAnalysis);
-        Collection<Statement> slice = ts.computeBackwardThinSlice( statement );
-        Map<String, List<Integer>> k = dumpSlice(slice);
+    public void thinSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		Collection<Statement> slice;
+		Map<String, List<Integer>> k = new HashMap<String, List<Integer>>();;
+		for(Statement statement : statements) {
+			ThinSlicer ts = new ThinSlicer(context.callGraph, context.pointerAnalysis);
+			slice = ts.computeBackwardThinSlice( statement );
+			Map<String, List<Integer>> m = dumpSlice(slice);
+			k = merge(k,m);
+		}
+		k =removeDuplicates(k);
 		context.map = k;
+		debugLinenumbers(k);
+		
     }
     
     /**
@@ -220,8 +243,8 @@ public class SlicingTask implements ITask {
                         		a.add(src_line_number);
                         		src.put(key, a );
                         }
-                        			//System.out.print(s.getNode().getMethod().getSignature());
-                        		System.err.println("Class: " +s.getNode().getMethod().getDeclaringClass().getName().getClassName() + " ;Line number: " + src_line_number);
+                        		//System.out.print(s.getNode().getMethod().getSignature());
+                        		 //System.err.println("Class: " +s.getNode().getMethod().getDeclaringClass().getName().getClassName() + " ;Line number: " + src_line_number);
                     } catch (Exception e) {
                         // System.err.println("Bytecode index no good");
                         // System.err.println(e.getMessage());
@@ -234,7 +257,6 @@ public class SlicingTask implements ITask {
             }
 
         }
-        debugLinenumbers(src);
         return src;
     }
     
@@ -243,10 +265,22 @@ public class SlicingTask implements ITask {
      * Prints out all the line numbers from the slice
      * @param k
      */
-    public void debugLinenumbers(Map<String,List<Integer>> src) {
-    		for (Map.Entry<String, List<Integer>> entry : src.entrySet())
+    public void debugLinenumbers(Map<String,List<Integer>> m) {
+    		System.err.println("Line numbers:");
+    		for (Map.Entry<String, List<Integer>> entry : m.entrySet())
         {
             System.err.println(entry.getKey() + " " + entry.getValue());
+        }
+    }
+    
+    /**
+     * Prints out all the line numbers and the corresponding class names from the slice
+     * @param m
+     */
+    public void printLinenumbers(Map<String,List<Integer>> m){
+    		for (Map.Entry<String, List<Integer>> entry : m.entrySet())
+        {
+            System.err.println("Class: " + entry.getKey() + " ; Line number: " + entry.getValue());
         }
     }
     
@@ -261,5 +295,39 @@ public class SlicingTask implements ITask {
     		return segs[0];
     }
     
-	}
-
+    /**
+     * Merges two maps into one, copies all the Integers from one list into the other if the key already exists.
+     * @param map1
+     * @param map2
+     * @return
+     */
+    public Map<String, List<Integer>> merge(Map<String, List<Integer>> map1, Map<String, List<Integer>> map2){
+    		for (Map.Entry<String, List<Integer>> entry : map2.entrySet())
+    			{	
+    			   if(map1.containsKey(entry.getKey())) {
+    				   for(Integer i : map2.get(entry.getKey())) {
+    					   map1.get(entry.getKey()).add(i);
+    				   }
+    			   }else {
+    				   map1.put(entry.getKey(), entry.getValue());
+    			   }
+    			}
+    			return map1;
+    }
+    
+    /**
+     * removes all duplicates in a Map
+     * @param m
+     * @return
+     */
+    public Map<String, List<Integer>> removeDuplicates(Map<String,List<Integer>> m) {
+		for (Map.Entry<String, List<Integer>> entry : m.entrySet())
+		{
+			List<Integer> l = entry.getValue().stream()
+			         .distinct()
+			         .collect(Collectors.toList());
+			m.put(entry.getKey(), l);
+		}
+		return m;
+    	}
+}
