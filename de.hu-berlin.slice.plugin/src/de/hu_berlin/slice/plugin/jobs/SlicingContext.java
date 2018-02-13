@@ -31,7 +31,7 @@ public class SlicingContext {
     CallGraph callGraph;
     
     public enum sliceType{
-    		backward, forward, thinBackward;
+    		backward, forward, thinBackward, fullBackward;
     };
     
     

@@ -35,32 +35,35 @@ public class SlicingTask implements ITask {
 
 
 	@Override
-    public void run(IProgressMonitor monitor, SlicingContext context) throws TaskException {
-        monitor.subTask("computing the slice...");
-        try {
-        	
-        			List<NormalStatement> statements = getStatements(context);
-                
-                switch(context.sliceType) {
-                		case backward:
-                			//backwardSlice(statement, context);
-                			backwardSlice(statements, context);
-                			break;
-                		case forward:
-                			//forwardSlice(statement, context);
-                			forwardSlice(statements, context);
-                			break;
-                		case thinBackward:
-                			thinSlice(statements, context);
-                			break;
-                }
-        }
-        catch (Exception e) {
-            throw new TaskException(null, e);
-        }
-        		monitor.done();
-    		}
-	
+	public void run(IProgressMonitor monitor, SlicingContext context) throws TaskException {
+		monitor.subTask("computing the slice...");
+		try {
+
+			List<NormalStatement> statements = getStatements(context);
+
+			switch(context.sliceType) {
+			case backward:
+				//backwardSlice(statement, context);
+				backwardSlice(statements, context);
+				break;
+			case forward:
+				//forwardSlice(statement, context);
+				forwardSlice(statements, context);
+				break;
+			case thinBackward:
+				thinSlice(statements, context);
+				break;
+			case fullBackward:
+				backwardFullSlice(statements, context);
+				break;
+			}
+		}
+		catch (Exception e) {
+			throw new TaskException(null, e);
+		}
+		monitor.done();
+	}
+
 	
 	/**
 	 * Finds a Statement (from the SlicingContext) inside the call graph and returns it.
@@ -140,24 +143,24 @@ public class SlicingTask implements ITask {
      * @throws InvalidClassFileException 
      */
     public static List<NormalStatement> findStatements(CGNode n, int l) throws InvalidClassFileException {
-        IR ir = n.getIR();
-        IBytecodeMethod method = (IBytecodeMethod)ir.getMethod();
-        List<com.ibm.wala.ipa.slicer.NormalStatement> list = new ArrayList<NormalStatement>();
-        for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
-            SSAInstruction s = it.next();
-                		int i = s.iindex;
-                		if(i>=0) {
-                		int bc = method.getBytecodeIndex(i);
-                    
-                		if(method.getLineNumber(bc)== l) {
-                			list.add(new com.ibm.wala.ipa.slicer.NormalStatement(n, i));
-                		}
-                		}
-            
-        }
-        return list;
+    	IR ir = n.getIR();
+    	IBytecodeMethod method = (IBytecodeMethod)ir.getMethod();
+    	List<com.ibm.wala.ipa.slicer.NormalStatement> list = new ArrayList<NormalStatement>();
+    	for (Iterator<SSAInstruction> it = ir.iterateAllInstructions(); it.hasNext();) {
+    		SSAInstruction s = it.next();
+    		int i = s.iindex;
+    		if(i>=0) {
+    			int bc = method.getBytecodeIndex(i);
+
+    			if(method.getLineNumber(bc)== l) {
+    				list.add(new com.ibm.wala.ipa.slicer.NormalStatement(n, i));
+    			}
+    		}
+
+    	}
+    	return list;
     }
-        
+
     /**
      * Computes the forward slice and adds the line numbers to the slicing context.
      * @param statement
@@ -166,17 +169,36 @@ public class SlicingTask implements ITask {
      * @throws CancelException
      */
     public void forwardSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		forwardSliceWithOptions(statements, context, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+    }
+    
+    /**
+     * Computes the full forward slice and adds the line numbers to the slicing context.
+     * @param statement
+     * @param SlicingContext
+     * @throws IllegalArgumentException
+     * @throws CancelException
+     */
+    public void forwardFullSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		forwardSliceWithOptions(statements, context, DataDependenceOptions.FULL, ControlDependenceOptions.FULL);
+    }
+
+
+	private void forwardSliceWithOptions(List<NormalStatement> statements, SlicingContext context,
+			DataDependenceOptions dataDepOption, ControlDependenceOptions controlDepOption)
+			throws CancelException {
 		Collection<Statement> slice;
 		Map<String, List<Integer>> k = new HashMap<String, List<Integer>>();;
 		for(Statement statement : statements) {
-			slice = Slicer.computeForwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+			slice = Slicer.computeForwardSlice(statement, context.callGraph, 
+					context.pointerAnalysis, dataDepOption, controlDepOption);
 			Map<String, List<Integer>> m = dumpSlice(slice);
 			k = merge(k,m);
 		}
 		k =removeDuplicates(k);
 		context.map = k;
 		debugLinenumbers(k);
-    }
+	}
     
     /**
      * Computes the backward slice and adds the line numbers to the slicing context.
@@ -186,18 +208,36 @@ public class SlicingTask implements ITask {
      * @throws CancelException
      */    
     public void backwardSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+		backWardSliceWithOptions(statements, context, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+		
+    }
+    
+    /**
+     * Computes the full backward slice and adds the line numbers to the slicing context.
+     * @param statement
+     * @param SlicingContext
+     * @throws IllegalArgumentException
+     * @throws CancelException
+     */    
+    public void backwardFullSlice(List<NormalStatement> statements, SlicingContext context) throws IllegalArgumentException, CancelException {
+    	backWardSliceWithOptions(statements, context, DataDependenceOptions.FULL, ControlDependenceOptions.FULL);
+    }
+    
+    private void backWardSliceWithOptions(List<NormalStatement> statements, SlicingContext context, 
+			DataDependenceOptions dataDepOption, ControlDependenceOptions controlDepOption)
+			throws CancelException {
 		Collection<Statement> slice;
 		Map<String, List<Integer>> k = new HashMap<String, List<Integer>>();;
 		for(Statement statement : statements) {
-			slice = Slicer.computeBackwardSlice(statement, context.callGraph, context.pointerAnalysis, DataDependenceOptions.NO_BASE_PTRS, ControlDependenceOptions.NONE);
+			slice = Slicer.computeBackwardSlice(statement, context.callGraph, 
+					context.pointerAnalysis, dataDepOption, controlDepOption);
 			Map<String, List<Integer>> m = dumpSlice(slice);
 			k = merge(k,m);
 		}
 		k =removeDuplicates(k);
 		context.map = k;
 		debugLinenumbers(k);
-		
-    }
+	}
     
     /**
      * Computes the thin backward slice and adds the line numbers to the slicing context.

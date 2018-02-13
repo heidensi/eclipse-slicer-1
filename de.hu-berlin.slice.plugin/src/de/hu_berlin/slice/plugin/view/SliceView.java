@@ -25,6 +25,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -101,6 +102,8 @@ public class SliceView extends ViewPart {
     private Action refreshViewAction;
     private Action sliceForwardAction;
     private Action sliceBackwardAction;
+    private Action sliceThinBackwardAction;
+    private Action sliceFullBackwardAction;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -143,6 +146,9 @@ public class SliceView extends ViewPart {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(sliceBackwardAction);
+        manager.add(sliceThinBackwardAction);
+        manager.add(sliceFullBackwardAction);
+        manager.add(new Separator());
         manager.add(sliceForwardAction);
         manager.add(new Separator());
         manager.add(clearViewAction);
@@ -152,71 +158,87 @@ public class SliceView extends ViewPart {
     //Buttons get specified
     private void configureActions() {
 
-        //
         // Action to clear the view
-        //
-        clearViewAction = new Action() {
-            @Override
-            public void run() {
-            		IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-            		for(IEditorReference ex : editors) {
-            			Highlighting h;
-						try {
-							h = new Highlighting(ex);
-							h.deleteAllMarkers();
-						} catch (PartInitException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-            			
-            		}
-            		
-            		
-            }
-        };
-        clearViewAction.setText("Clear");
-        clearViewAction.setToolTipText("Clears the slice result view.");
-        clearViewAction.setImageDescriptor(PluginImages.DESC_CLEAR);
+    	clearViewAction = createAction(
+    			"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR, 
+    			new Action() {
+    				@Override
+    				public void run() {
+    					IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+    					for(IEditorReference ex : editors) {
+    						Highlighting h;
+    						try {
+    							h = new Highlighting(ex);
+    							h.deleteAllMarkers();
+    						} catch (PartInitException e1) {
+    							// TODO Auto-generated catch block
+    							e1.printStackTrace();
+    						} catch (CoreException e) {
+    							// TODO Auto-generated catch block
+    							e.printStackTrace();
+    						}
 
-        //
-        // Action to refresh the view.
-        //
-        refreshViewAction = createPlaceholderAction("Refresh view button clicked!");
-        refreshViewAction.setText("Refresh");
-        refreshViewAction.setToolTipText("Refreshes the slice result view.");
-        refreshViewAction.setImageDescriptor(PluginImages.DESC_UPDATE);
+    					}
+    				}
+    			});
+
+    	// Action to refresh the view.
+    	refreshViewAction = createAction(
+    			"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE, 
+    			createPlaceholderAction("Refresh view button clicked!"));
         // enable refresh on pressing F5 etc.
         refreshViewAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
 
-        //
         // Action to perform backward slice
-        //
-        sliceBackwardAction = new Action() {
-            @Override
-            public void run() {
-                slice(sliceType.backward); // demo
-            }
-        };
-        sliceBackwardAction.setText("Slice backwards");
-        sliceBackwardAction.setToolTipText("Performs a backward slice.");
-        sliceBackwardAction.setImageDescriptor(PluginImages.DESC_RUN_BACKWARD);
+        sliceBackwardAction = createAction(
+        		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.backward);
+        			}
+        		});
 
-        //
+        // Action to perform thin backward slice
+        sliceThinBackwardAction = createAction(
+        		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.thinBackward);
+        			}
+        		});
+
+        // Action to perform full backward slice
+        sliceFullBackwardAction = createAction(
+        		"Slice backward (full)", "Performs a full backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.fullBackward);
+        			}
+        		});
+
         // Action to perform forward slice
-        //
-        sliceForwardAction = new Action() {
-            @Override
-            public void run() {
-            		slice(sliceType.forward); // demo
-            }
-        };
+        sliceForwardAction = createAction(
+        		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD, 
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.forward);
+        			}
+        		});
         sliceForwardAction.setText("Slice forward");
         sliceForwardAction.setToolTipText("Performs a forward slice.");
         sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
     }
+
+	private Action createAction(String text, String toolTipText, ImageDescriptor imageDescriptor, Action action) {
+		action.setText(text);
+		action.setToolTipText(toolTipText);
+		action.setImageDescriptor(imageDescriptor);
+		return action;
+	}
 
     /**
 	 * demo for slicing
