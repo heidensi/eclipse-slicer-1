@@ -53,7 +53,7 @@ public class Highlighting {
 
 
 	/**
-	 * Highlights a Line according to a given line number.
+	 * Highlights a Line given the line number.
 	 * @param linenumber
 	 * line number from the editor
 	 * @throws CoreException
@@ -71,6 +71,13 @@ public class Highlighting {
 		MarkerFactory.createMarker(file, offset, length);
 	}
 
+	/**
+	 * Highlights a Line given the line number and color.
+	 * @param linenumber line number from the editor
+	 * @param color color to highlight the line
+	 * @throws CoreException
+	 * @throws BadLocationException
+	 */
 	public void HighlightLine(int linenumber, String color) throws CoreException, BadLocationException {
 
 		IDocumentProvider provider = new TextFileDocumentProvider();

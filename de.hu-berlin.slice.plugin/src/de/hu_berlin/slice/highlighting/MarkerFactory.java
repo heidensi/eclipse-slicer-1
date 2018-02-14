@@ -81,6 +81,7 @@ public class MarkerFactory {
 	 * the indenting of the statement
 	 * @param length
 	 * of the statement
+	 * @param color color to highlight the line. can not be arbitrary, a matching marker has to be in the plugin.xml
 	 * @return marker
 	 * @throws CoreException
 	 */
