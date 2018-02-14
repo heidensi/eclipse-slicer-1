@@ -74,7 +74,7 @@ public class MarkerFactory {
 	}
 
 	/**
-	 * Highlights a line in blue and adds a marker.
+	 * Highlights a line in a specific color and adds a marker.
 	 * @param res
 	 * active editor window
 	 * @param offset
@@ -84,9 +84,12 @@ public class MarkerFactory {
 	 * @return marker
 	 * @throws CoreException
 	 */
-	public static IMarker createMarkerBlue(IResource res, int offset, int length) throws CoreException {
+	public static IMarker createMarker(IResource res, int offset, int length, String color) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("de.hu_berlin.slice.marker.slicerThin");
+		if (color.equals("blue"))
+		    marker = res.createMarker("de.hu_berlin.slice.marker.slicerThin");
+		else
+		    marker = res.createMarker("de.hu_berlin.slice.marker.slicer"); //green
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.CHAR_START, offset);

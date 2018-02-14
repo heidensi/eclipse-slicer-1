@@ -1,16 +1,11 @@
 package de.hu_berlin.slice.plugin.view;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -38,21 +33,16 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
-import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import de.hu_berlin.slice.ast.ASTService;
+import de.hu_berlin.slice.highlighting.Highlighting;
 import de.hu_berlin.slice.plugin.AnalysisScopeFactory;
 import de.hu_berlin.slice.plugin.BundleService;
 import de.hu_berlin.slice.plugin.GuiceModule;
@@ -64,7 +54,6 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
-import de.hu_berlin.slice.highlighting.Highlighting;
 /**
  * Slice View
  * @author IShowerNaked
@@ -160,7 +149,7 @@ public class SliceView extends ViewPart {
 
         // Action to clear the view
     	clearViewAction = createAction(
-    			"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR, 
+    			"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR,
     			new Action() {
     				@Override
     				public void run() {
@@ -184,14 +173,14 @@ public class SliceView extends ViewPart {
 
     	// Action to refresh the view.
     	refreshViewAction = createAction(
-    			"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE, 
+    			"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE,
     			createPlaceholderAction("Refresh view button clicked!"));
         // enable refresh on pressing F5 etc.
         refreshViewAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
 
         // Action to perform backward slice
         sliceBackwardAction = createAction(
-        		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD,
         		new Action() {
         			@Override
         			public void run() {
@@ -201,7 +190,7 @@ public class SliceView extends ViewPart {
 
         // Action to perform thin backward slice
         sliceThinBackwardAction = createAction(
-        		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD,
         		new Action() {
         			@Override
         			public void run() {
@@ -211,7 +200,7 @@ public class SliceView extends ViewPart {
 
         // Action to perform full backward slice
         sliceFullBackwardAction = createAction(
-        		"Slice backward (full)", "Performs a full backward slice.", PluginImages.DESC_RUN_BACKWARD, 
+        		"Slice backward (full)", "Performs a full backward slice.", PluginImages.DESC_RUN_BACKWARD,
         		new Action() {
         			@Override
         			public void run() {
@@ -221,7 +210,7 @@ public class SliceView extends ViewPart {
 
         // Action to perform forward slice
         sliceForwardAction = createAction(
-        		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD, 
+        		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD,
         		new Action() {
         			@Override
         			public void run() {
@@ -248,10 +237,10 @@ public class SliceView extends ViewPart {
         List<String> out = new ArrayList<>();
 
         try {
-          
+
             EditorContext editorContext = editorContextFactory.create(workbench);
 
-            
+
             ITextSelection    textSelection     = editorContext.getTextSelection();
             ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
             IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();
@@ -268,14 +257,14 @@ public class SliceView extends ViewPart {
             out.add("Statement offset: "                 + statementNode.getStartPosition());
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
-            
+
             clearViewAction.run();
-            
+
             Highlighting h = new Highlighting();
             h.HighlightSelected(textSelection);
             IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
             SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
-            
+
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
                 @Override
@@ -284,7 +273,7 @@ public class SliceView extends ViewPart {
 							//System.out.println(ex.getTitle());
 							String s = stringSplit(ex.getTitle());
 							//System.out.println(s);
-							
+
 							if(slicingContext.getMap().containsKey(s)) {
 								for(int i :slicingContext.getMap().get(s)) {
 									try {
@@ -300,8 +289,8 @@ public class SliceView extends ViewPart {
                 }
             });
             mainJob.schedule();
-     
-            
+
+
         }
         catch (Exception e) {
             out.add("-- An error occured! --\n");
@@ -330,7 +319,7 @@ public class SliceView extends ViewPart {
     public void setFocus() {
         console.getControl().setFocus();
     }
-    
+
     /**
      * cuts off the type extension
      * @param s
