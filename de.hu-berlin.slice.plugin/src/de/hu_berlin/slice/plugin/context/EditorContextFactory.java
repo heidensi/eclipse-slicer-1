@@ -22,6 +22,7 @@ import de.hu_berlin.slice.plugin.context.JavaProjectContextFactory.JavaProjectCo
  * Represents the creating process of the editor context.
  * @author IShowerNaked
  */
+
 @SuppressWarnings("restriction")
 public class EditorContextFactory {
 
@@ -53,9 +54,7 @@ public class EditorContextFactory {
         private Statement statementNode;
 
         private MethodDeclaration methodDeclaration;
-        
-        
-        
+
         public ASTNode getAST() {
             return ast;
         }
@@ -138,7 +137,7 @@ public class EditorContextFactory {
         }
 
         ASTNode ast = astService.createAST(compilationUnit);
-        
+
         Statement statementNode = astService.findStatementNodeForSelection(ast, textSelection);
         if (null == statementNode) {
             throw new EditorContextFactoryException("The text selection does not belong to a statement node.", null);

@@ -30,6 +30,7 @@ class BuildScopeTask implements ITask {
             exclusionsFile = bundleService.getFileByPath("dat/Java60RegressionExclusions.txt");
             
             context.analysisScope = analysisScopeFactory.create(context.getJavaProject(), exclusionsFile);
+          
         } catch (Exception e) {
             throw new TaskException(null, e);
         }

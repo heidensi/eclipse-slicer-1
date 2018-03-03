@@ -40,7 +40,7 @@ public class AnalysisScopeFactory {
     /**
      * Creates an AnalysisScope.
      * @param javaProject
-     * current java project
+     * the current java project
      * @param exclusionsFile
      * XML-based file, which tells WALA to ignore certain classes or packages
      * @return analysisScope
@@ -53,8 +53,10 @@ public class AnalysisScopeFactory {
         
         //Maps each module to either Application, Extension, Primordial or Source and adds it to the AnalysisScope
     		Map<ClasspathLoader, List<Module>> modules = getModules(javaProject);
+
         for (ClasspathLoader classpathLoader : modules.keySet()) {
             for (Module module : modules.get(classpathLoader)) {
+            	//adds each module to the analysis scope
                 analysisScope.addToScope(classpathLoader.getClassLoaderReference(), module);
             }
         }

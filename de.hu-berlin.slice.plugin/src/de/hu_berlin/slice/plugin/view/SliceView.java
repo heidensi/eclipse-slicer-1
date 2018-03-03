@@ -2,11 +2,10 @@ package de.hu_berlin.slice.plugin.view;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -21,6 +20,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -29,19 +29,20 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import de.hu_berlin.slice.ast.ASTService;
+import de.hu_berlin.slice.highlighting.Highlighting;
 import de.hu_berlin.slice.plugin.AnalysisScopeFactory;
 import de.hu_berlin.slice.plugin.BundleService;
 import de.hu_berlin.slice.plugin.GuiceModule;
@@ -52,7 +53,7 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory;
 import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
-import de.hu_berlin.slice.highlighting.Highlighting;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
 /**
  * Slice View
  * @author IShowerNaked
@@ -90,6 +91,8 @@ public class SliceView extends ViewPart {
     private Action refreshViewAction;
     private Action sliceForwardAction;
     private Action sliceBackwardAction;
+    private Action sliceThinBackwardAction;
+    private Action sliceFullBackwardAction;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -132,91 +135,112 @@ public class SliceView extends ViewPart {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(sliceBackwardAction);
+        manager.add(sliceThinBackwardAction);
+        manager.add(sliceFullBackwardAction);
+        manager.add(new Separator());
         manager.add(sliceForwardAction);
         manager.add(new Separator());
         manager.add(clearViewAction);
         manager.add(refreshViewAction);
     }
-    
-    //Buttons get specified 
+
+    //Buttons get specified
     private void configureActions() {
 
-        //
         // Action to clear the view
-        //
-        clearViewAction = createPlaceholderAction("Clear view button clicked!");
-        clearViewAction.setText("Clear");
-        clearViewAction.setToolTipText("Clears the slice result view.");
-        clearViewAction.setImageDescriptor(PluginImages.DESC_CLEAR);
-        
-        clearViewAction = new Action() {
-            @Override
-            public void run() {
-            		Highlighting h = new Highlighting();
-            			try {
-							h.deleteMarkers();
-						} catch (CoreException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-            		
-            }
-        };
+    	clearViewAction = createAction(
+    			"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR,
+    			new Action() {
+    				@Override
+    				public void run() {
+    					IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+    					for(IEditorReference ex : editors) {
+    						Highlighting h;
+    						try {
+    							h = new Highlighting(ex);
+    							h.deleteAllMarkers();
+    						} catch (PartInitException e1) {
+    							// TODO Auto-generated catch block
+    							e1.printStackTrace();
+    						} catch (CoreException e) {
+    							// TODO Auto-generated catch block
+    							e.printStackTrace();
+    						}
 
-        //
-        // Action to refresh the view.
-        //
-        refreshViewAction = createPlaceholderAction("Refresh view button clicked!");
-        refreshViewAction.setText("Refresh");
-        refreshViewAction.setToolTipText("Refreshes the slice result view.");
-        refreshViewAction.setImageDescriptor(PluginImages.DESC_UPDATE);
+    					}
+    				}
+    			});
+
+    	// Action to refresh the view.
+    	refreshViewAction = createAction(
+    			"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE,
+    			createPlaceholderAction("Refresh view button clicked!"));
         // enable refresh on pressing F5 etc.
         refreshViewAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
 
-        //
         // Action to perform backward slice
-        //
-        sliceBackwardAction = new Action() {
-            @Override
-            public void run() {
-                slice(false); // demo
-            }
-        };
-        sliceBackwardAction.setText("Slice backwards");
-        sliceBackwardAction.setToolTipText("Performs a backward slice.");
-        sliceBackwardAction.setImageDescriptor(PluginImages.DESC_RUN_BACKWARD);
+        sliceBackwardAction = createAction(
+        		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD,
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.backward);
+        			}
+        		});
 
-        //
+        // Action to perform thin backward slice
+        sliceThinBackwardAction = createAction(
+        		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD,
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.thinBackward);
+        			}
+        		});
+
+        // Action to perform full backward slice
+        sliceFullBackwardAction = createAction(
+        		"Slice backward (full)", "Performs a full backward slice.", PluginImages.DESC_RUN_BACKWARD,
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.fullBackward);
+        			}
+        		});
+
         // Action to perform forward slice
-        //
-        sliceForwardAction = new Action() {
-            @Override
-            public void run() {
-            		slice(true); // demo
-            }
-        };
+        sliceForwardAction = createAction(
+        		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD,
+        		new Action() {
+        			@Override
+        			public void run() {
+        				slice(sliceType.forward);
+        			}
+        		});
         sliceForwardAction.setText("Slice forward");
         sliceForwardAction.setToolTipText("Performs a forward slice.");
         sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
     }
 
-    //
-    // Action implementations.
-    //
+	private Action createAction(String text, String toolTipText, ImageDescriptor imageDescriptor, Action action) {
+		action.setText(text);
+		action.setToolTipText(toolTipText);
+		action.setImageDescriptor(imageDescriptor);
+		return action;
+	}
 
     /**
 	 * demo for slicing
      */
-    private void slice(boolean sliceType) {
+    private void slice(sliceType sliceType) {
 
         List<String> out = new ArrayList<>();
 
         try {
-        
+
             EditorContext editorContext = editorContextFactory.create(workbench);
 
-            
-            //
+
             ITextSelection    textSelection     = editorContext.getTextSelection();
             ICompilationUnit  compilationUnit   = editorContext.getCompilationUnit();
             IJavaProject      javaProject       = editorContext.getJavaProjectContext().getJavaProject();
@@ -233,48 +257,40 @@ public class SliceView extends ViewPart {
             out.add("Statement offset: "                 + statementNode.getStartPosition());
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
-            
+
+            clearViewAction.run();
+
             Highlighting h = new Highlighting();
-            h.deleteMarkers();
             h.HighlightSelected(textSelection);
-            
+            IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
             SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
 
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
                 @Override
                 public void done(IJobChangeEvent event) {
-                    try {
-						for(int i : slicingContext.getList()) {
-							h.HighlightLine(i);
+                    for(IEditorReference ex : editors) {
+							//System.out.println(ex.getTitle());
+							String s = stringSplit(ex.getTitle());
+							//System.out.println(s);
+
+							if(slicingContext.getMap().containsKey(s)) {
+								for(int i :slicingContext.getMap().get(s)) {
+									try {
+										Highlighting g = new Highlighting(ex);
+										g.HighlightLine(i);
+									} catch (CoreException | BadLocationException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}
 						}
-					} catch (CoreException | BadLocationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
                 }
             });
             mainJob.schedule();
-            
-//                // "LMainlol"
-//                Iterable<Entrypoint> entrypoints = com.ibm.wala.ipa.callgraph.impl.Util.makeMainEntrypoints(analysisScope, classHierarchy);
-//
-//                Entrypoint demoEntrypoint = null;
-//                for (Entrypoint ep : entrypoints) {
-//                    demoEntrypoint = ep;
-//                    out.add("entrypoint: " + ep.getMethod().getSignature());
-//                    break;
-//                }
-//
-//                if (null == demoEntrypoint) {
-//                    throw new Exception("Could not determine entry point.");
-//                }
-//
-//                Set<IMethod> possibleTargets = classHierarchy.getPossibleTargets(demoEntrypoint.getMethod().getReference());
-//                out.add("Possible targets:");
-//                possibleTargets.forEach(method -> out.add(method.getName().toString()));
-//
-//                out.add(classHierarchy.toString());
+
+
         }
         catch (Exception e) {
             out.add("-- An error occured! --\n");
@@ -285,10 +301,6 @@ public class SliceView extends ViewPart {
 
         console.getDocument().set(String.join("\n", out));
     }
-
-    //
-    // Utility methods.
-    //
 
     private void alert(String msg) {
         MessageDialog.openInformation(console.getControl().getShell(), "Slice View", msg);
@@ -303,12 +315,18 @@ public class SliceView extends ViewPart {
         };
     }
 
-    //
-    // Other methods.
-    //
-
     @Override
     public void setFocus() {
         console.getControl().setFocus();
     }
+
+    /**
+     * cuts off the type extension
+     * @param s
+     * @return
+     */
+    public String stringSplit(String s) {
+		String[] segs = s.split( Pattern.quote( "." ) );
+		return segs[0];
+}
 }

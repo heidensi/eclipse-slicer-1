@@ -33,21 +33,23 @@
             <view ratio="0.5" relative="org.eclipse.ui.views.ProblemView" relationship="right" id="de.hu_berlin.slice.plugin.view.SliceView" />
         </perspectiveExtension>
     </extension>
-    <extension point="org.eclipse.core.resources.markers" id="de.hu_berlin.slice.marker.slicer" name="Marker">
+    <!-- markers and annotations  -->
+    <extension point="org.eclipse.core.resources.markers" id="de.hu_berlin.slice.marker.slicer" name="Slice">
         <super type="org.eclipse.core.resources.textmarker" />
         <super type="org.eclipse.core.resources.marker" />
         <persistent value="true" />
     </extension>
-    <extension point="org.eclipse.core.resources.markers" id="de.hu_berlin.slice.marker.slicer" name="Marker">
-        <super type="org.eclipse.core.resources.marker" />
+    <extension point="org.eclipse.core.resources.markers" id="de.hu_berlin.slice.marker.slicerThin" name="Thin Slice">
         <super type="org.eclipse.core.resources.textmarker" />
         <super type="org.eclipse.core.resources.marker" />
         <persistent value="true" />
     </extension>
     <extension point="org.eclipse.ui.editors.markerAnnotationSpecification" id="myannotationspecification" name="MyAnnotation">
-        <specification annotationType="de.hu_berlin.slice.annotations.slicer" label="MyAnnotation" overviewRulerPreferenceKey="clruler" overviewRulerPreferenceValue="true" colorPreferenceKey="clcolor" colorPreferenceValue="51,255,128" textPreferenceKey="cltext" textPreferenceValue="true" verticalRulerPreferenceKey="clvertical" verticalRulerPreferenceValue="true" textStylePreferenceKey="clstyle" textStylePreferenceValue="BOX" />
+        <specification annotationType="de.hu_berlin.slice.annotations.slicer" label="MyAnnotation" overviewRulerPreferenceKey="clruler" overviewRulerPreferenceValue="true" colorPreferenceKey="fullSlice" colorPreferenceValue="51,255,128" textPreferenceKey="cltext" textPreferenceValue="true" verticalRulerPreferenceKey="clvertical" verticalRulerPreferenceValue="true" textStylePreferenceKey="clstyle" textStylePreferenceValue="BOX" />
+        <specification annotationType="de.hu_berlin.slice.annotations.slicerThin" label="MyAnnotationThin" overviewRulerPreferenceKey="clruler" overviewRulerPreferenceValue="true" colorPreferenceKey="thinSlice" colorPreferenceValue="0,255,255" textPreferenceKey="cltext" textPreferenceValue="true" verticalRulerPreferenceKey="clvertical" verticalRulerPreferenceValue="true" textStylePreferenceKey="clstyle" textStylePreferenceValue="BOX" />
     </extension>
     <extension point="org.eclipse.ui.editors.annotationTypes">
         <type markerSeverity="0" super="org.eclipse.ui.workbench.texteditor.info" name="de.hu_berlin.slice.annotations.slicer" markerType="de.hu_berlin.slice.marker.slicer" />
+        <type markerSeverity="0" super="org.eclipse.ui.workbench.texteditor.info" name="de.hu_berlin.slice.annotations.slicerThin" markerType="de.hu_berlin.slice.marker.slicerThin" />
     </extension>
 </plugin>
