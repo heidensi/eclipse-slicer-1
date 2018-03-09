@@ -28,6 +28,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
@@ -37,7 +38,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -58,7 +58,9 @@ import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
  * Slice View
  * @author IShowerNaked
  */
+
 public class SliceView extends ViewPart {
+
 
     /** The ID of the view as specified by the extension. */
     public static final String ID = "de.hu_berlin.slice.plugin.view.SliceView";
@@ -293,11 +295,22 @@ public class SliceView extends ViewPart {
 
         }
         catch (Exception e) {
+            /*
+             * for debugging purposes
+             *
             out.add("-- An error occured! --\n");
             out.add("message: " + e.getMessage());
             out.add("class: " + e.getClass().getName());
             out.add("stacktrace: " + Throwables.getStackTraceAsString(e));
+            */
+
+            String message = e.getMessage();
+            if (message == null)
+        	message = "The text selection does not belong to a statement node.";
+            Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            MessageDialog.openError(activeShell, "An error occured", message);
         }
+
 
         console.getDocument().set(String.join("\n", out));
     }
