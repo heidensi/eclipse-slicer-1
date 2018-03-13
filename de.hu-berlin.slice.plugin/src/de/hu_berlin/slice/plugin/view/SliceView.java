@@ -298,11 +298,11 @@ public class SliceView extends ViewPart {
             /*
              * for debugging purposes
              *
-            out.add("-- An error occured! --\n");
-            out.add("message: " + e.getMessage());
-            out.add("class: " + e.getClass().getName());
-            out.add("stacktrace: " + Throwables.getStackTraceAsString(e));
-            */
+             *out.add("-- An error occured! --\n");
+             *out.add("message: " + e.getMessage());
+             *out.add("class: " + e.getClass().getName());
+             *out.add("stacktrace: " + Throwables.getStackTraceAsString(e));
+             */
 
             String message = e.getMessage();
             if (message == null)

@@ -18,34 +18,35 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
  * @author IShowerNaked
  */
 public class SlicingContext {
-	
+
 
     EditorContext editorContext;
 
     AnalysisScope analysisScope;
 
     ClassHierarchy classHierarchy;
-    
+
     List<Integer> list;
-    
+
     CallGraph callGraph;
-    
+
+
     public enum sliceType{
     		backward, forward, thinBackward, fullBackward;
     };
-    
-    
+
+
     PointerAnalysis<InstanceKey> pointerAnalysis;
-    
+
     Map<String, List<Integer>> map;
 
-	public sliceType sliceType;
-    
+    public sliceType sliceType;
+
 
     public SlicingContext(EditorContext editorContext, sliceType b) {
         this.editorContext = editorContext;
         this.sliceType = b;
-        
+
     }
 
     public IJavaProject getJavaProject() {
@@ -59,22 +60,45 @@ public class SlicingContext {
     public ClassHierarchy getClassHierarchy() {
         return classHierarchy;
     }
-    
+
     public List<Integer> getList() {
     		return list;
     }
-    
+
     public Map<String,List<Integer>> getMap(){
     		return map;
     }
-    
-    
+
+
     /**
      * @return true for forward slice and false for backward slice
      */
     public sliceType getSliceType() {
     		return sliceType;
     }
-    
 
+
+    public CallGraph getCallGraph() {
+        return callGraph;
+    }
+
+    public void setPointerAnalysis(PointerAnalysis<InstanceKey> pointerAnalysis) {
+        this.pointerAnalysis = pointerAnalysis;
+    }
+
+    public void setAnalysisScope(AnalysisScope analysisScope) {
+        this.analysisScope = analysisScope;
+    }
+
+    public void setClassHierarchy(ClassHierarchy classHierarchy) {
+        this.classHierarchy = classHierarchy;
+    }
+
+    public void setSliceType(sliceType sliceType) {
+        this.sliceType = sliceType;
+    }
+
+    public void setCallGraph(CallGraph callGraph) {
+        this.callGraph = callGraph;
+    }
 }
