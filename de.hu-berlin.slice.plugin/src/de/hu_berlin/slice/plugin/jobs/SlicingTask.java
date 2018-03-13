@@ -95,8 +95,6 @@ public class SlicingTask implements ITask {
 	List<CGNode> result = new ArrayList<>();
         for (Iterator<? extends CGNode> it = context.callGraph.getSuccNodes(context.callGraph.getFakeRootNode()); it.hasNext();) {
             CGNode n = it.next();
-            System.out.println(n.getMethod().getDeclaringClass().getName().getClassName());
-            System.out.println(n.getMethod().getName());
             if(n.getMethod().getDeclaringClass().getName().getClassName() == aclassname) {
             	if (n.getMethod().getName().equals(name)) {
                     result.add(n);
