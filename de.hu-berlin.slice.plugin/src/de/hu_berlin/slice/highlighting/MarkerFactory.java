@@ -17,7 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class MarkerFactory {
 
-	public static final String MARKER = "de.hu_berlin.slice.marker.slicer";
+	public static final String MARKER = "de.hu_berlin.slice.marker.green";
 
 	/**
 	 * Creates a new marker type.
@@ -28,7 +28,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("de.hu_berlin.slice.marker.slicer"); //ID from the plugin.xml
+		marker = res.createMarker("de.hu_berlin.slice.marker.green"); //ID from the plugin.xml
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		return marker;
@@ -45,7 +45,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int linenumber) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
+		marker = res.createMarker("de.hu_berlin.slice.marker.green");
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.LINE_NUMBER, linenumber);
@@ -65,7 +65,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int offset, int length) throws CoreException {
 		IMarker marker = null;
-		marker = res.createMarker("de.hu_berlin.slice.marker.slicer");
+		marker = res.createMarker("de.hu_berlin.slice.marker.grey");
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.CHAR_START, offset);
@@ -87,10 +87,24 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int offset, int length, String color) throws CoreException {
 		IMarker marker = null;
-		if (color.equals("blue"))
-		    marker = res.createMarker("de.hu_berlin.slice.marker.slicerThin");
-		else
-		    marker = res.createMarker("de.hu_berlin.slice.marker.slicer"); //green
+		if (color.equals("blue")) {
+		    marker = res.createMarker("de.hu_berlin.slice.marker.blue");
+		    }
+		else if(color.equals("red")) {
+			 marker = res.createMarker("de.hu_berlin.slice.marker.red");
+		}
+		else if(color.equals("yellow")) {
+			 marker = res.createMarker("de.hu_berlin.slice.marker.yellow");
+		}
+		else if(color.equals("orange")) {
+			 marker = res.createMarker("de.hu_berlin.slice.marker.orange");
+		}
+		else if(color.equals("purple")) {
+			 marker = res.createMarker("de.hu_berlin.slice.marker.purple");
+		}
+		else{
+		    marker = res.createMarker("de.hu_berlin.slice.marker.green"); //green
+		    }
 		marker.setAttribute("description", "this is one of my markers");
 		marker.setAttribute(IMarker.MESSAGE, "My Marker");
 		marker.setAttribute(IMarker.CHAR_START, offset);
@@ -121,7 +135,15 @@ public class MarkerFactory {
 	 */
 	public static List<IMarker> findAllMarkers(IResource resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE));
+			List<IMarker> a = new ArrayList<IMarker>();
+			a.addAll(Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.red", true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.grey", true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.blue", true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.yellow", true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.orange", true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.purple", true, IResource.DEPTH_INFINITE)));
+			return a;
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}

@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -54,6 +55,8 @@ import de.hu_berlin.slice.plugin.context.EditorContextFactory.EditorContext;
 import de.hu_berlin.slice.plugin.jobs.JobFactory;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext;
 import de.hu_berlin.slice.plugin.jobs.SlicingContext.sliceType;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext.optionsCD;
+import de.hu_berlin.slice.plugin.jobs.SlicingContext.optionsData;
 /**
  * Slice View
  * @author IShowerNaked
@@ -94,7 +97,21 @@ public class SliceView extends ViewPart {
     private Action sliceForwardAction;
     private Action sliceBackwardAction;
     private Action sliceThinBackwardAction;
-    private Action sliceFullBackwardAction;
+    private Action automaticClear;
+    private Action optionsDDNONE;
+    private Action optionsDDNO_BASE_PTRS;
+    private Action optionsDDNO_BASE_NO_HEAP;
+    private Action optionsDDNo_HEAP;
+    private Action optionsDDREFLECTION;
+    private Action optionsDDFULL;
+    private Action optionsCDNONE;
+    private Action optionsCDFULL;
+    
+
+    private static optionsCD optionsCD;
+    private static optionsData optionsData;
+    
+    private String color =  "green";
 
     @Override
     public void createPartControl(Composite parent) {
@@ -107,6 +124,13 @@ public class SliceView extends ViewPart {
 
         configureActions();
         configureActionBars();
+        
+        optionsDDFULL.setChecked(true);
+        automaticClear.setChecked(true);
+        optionsData = optionsData.FULL;
+        optionsCDFULL.setChecked(true);
+        optionsCD = optionsCD.FULL;
+        clearViewAction.run();
     }
 
     //
@@ -120,8 +144,22 @@ public class SliceView extends ViewPart {
     }
 
     private void fillLocalPullDown(IMenuManager manager) {
-        // nothing here yet
-        // but later this will be a nice place to add expert functionality such as settings, filters etc.
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(optionsDDNONE);
+        manager.add(optionsDDNO_BASE_PTRS);
+        manager.add(optionsDDNO_BASE_NO_HEAP);
+        manager.add(optionsDDNo_HEAP);
+        manager.add(optionsDDREFLECTION);
+        manager.add(optionsDDFULL);
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(optionsCDNONE);
+        manager.add(optionsCDFULL);
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(automaticClear);
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(clearViewAction);
+        manager.add(sliceThinBackwardAction);
+        manager.add(refreshViewAction);
     }
 
     /**
@@ -137,92 +175,223 @@ public class SliceView extends ViewPart {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.add(sliceBackwardAction);
-        manager.add(sliceThinBackwardAction);
-        manager.add(sliceFullBackwardAction);
         manager.add(new Separator());
         manager.add(sliceForwardAction);
         manager.add(new Separator());
-        manager.add(clearViewAction);
-        manager.add(refreshViewAction);
     }
 
     //Buttons get specified
     private void configureActions() {
+    	
+		optionsDDNONE = new Action(
+	        "&DD NONE", IAction.AS_CHECK_BOX) {
+	      public void run() {
+	    	  	color = "purple";
+	    	  	System.out.println("NONE");
+	    	  	optionsDDNO_BASE_PTRS.setChecked(false);
+	    	  	optionsDDFULL.setChecked(false);
+	    	  	optionsDDNO_BASE_NO_HEAP.setChecked(false);
+	    	  	optionsDDNo_HEAP.setChecked(false);
+	    	  	optionsDDREFLECTION.setChecked(false);
+	    	  	
+	    	  	optionsDDNONE.setChecked(true);
+	    	  	
+	    	  	optionsData = optionsData.NONE;
+	      }
+	    };
+	    
+	    optionsDDNO_BASE_PTRS = new Action(
+	        "&DD NO_BASE_PTRS", IAction.AS_CHECK_BOX) {
+	      public void run() {
+	    	  color = "red";
+	    	  	System.out.println("NO_BASE_PTRS");
+	    	  		optionsDDNONE.setChecked(false);
+	    	  		optionsDDNO_BASE_NO_HEAP.setChecked(false);
+  	    	  	optionsDDFULL.setChecked(false);
+  	    	  	optionsDDNo_HEAP.setChecked(false);
+  	    	  	optionsDDREFLECTION.setChecked(false);
+  	    	  	
+  	    	  optionsDDNO_BASE_PTRS.setChecked(true);
+  	    	  
+  	    	optionsData = optionsData.NO_BASE_PTRS;
+	      }
+	    };
+	    
+	    	optionsDDFULL = new Action(
+      	        "&DD FULL", IAction.AS_CHECK_BOX) {
+      	      public void run() {
+      	    	  	color = "green";
+      	    	  	System.out.println("FULL");
+      	    	  	optionsDDNONE.setChecked(false);
+          	    	optionsDDNO_BASE_PTRS.setChecked(false);
+        	    	  	optionsDDNO_BASE_NO_HEAP.setChecked(false);
+        	    	  	optionsDDNo_HEAP.setChecked(false);
+        	    	  	optionsDDREFLECTION.setChecked(false);
+        	    	  	
+        	    	  	optionsDDFULL.setChecked(true);
+        	    	  	
+        	    	  	optionsData = optionsData.FULL;
+      	      }
+      	    };
+   
+      	    
+    optionsDDNO_BASE_NO_HEAP = new Action(
+      	        "&DD NO_BASE_NO_HEAP", IAction.AS_CHECK_BOX) {
+      	      public void run() {
+      	    	  	color = "blue";
+      	    	  	System.out.println("NO_BASE_NO_HEAP");
+      	    	  	optionsDDNONE.setChecked(false);
+          	    	optionsDDNO_BASE_PTRS.setChecked(false);
+          	    	optionsDDFULL.setChecked(false);
+        	    	  	optionsDDNo_HEAP.setChecked(false);
+        	    	  	optionsDDREFLECTION.setChecked(false);
+        	    	  	
+        	    	  	optionsDDNO_BASE_NO_HEAP.setChecked(true);
+        	    	  	
+        	    	  	optionsData = optionsData.NO_BASE_NO_HEAP;
+      	      }
+    	};
+    
+    	optionsDDNo_HEAP = new Action(
+  	        "&DD NO_HEAP", IAction.AS_CHECK_BOX) {
+  	      public void run() {
+  	    	  color = "yellow";
+  	    	  System.out.println("NO_HEAP");
+  	    	  optionsDDNONE.setChecked(false);
+  	    	  optionsDDNO_BASE_PTRS.setChecked(false);
+  	    	  optionsDDFULL.setChecked(false);
+  	    	  optionsDDNO_BASE_NO_HEAP.setChecked(false);
+  	    	  optionsDDREFLECTION.setChecked(false);
+  	    	  
+  	    	optionsDDNo_HEAP.setChecked(true);
+  	    	  
+  	    	optionsData = optionsData.NO_HEAP;
+  	      }
+    	};
 
-        // Action to clear the view
-    	clearViewAction = createAction(
-    			"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR,
-    			new Action() {
-    				@Override
-    				public void run() {
-    					IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-    					for(IEditorReference ex : editors) {
-    						Highlighting h;
-    						try {
-    							h = new Highlighting(ex);
-    							h.deleteAllMarkers();
-    						} catch (PartInitException e1) {
-    							// TODO Auto-generated catch block
-    							e1.printStackTrace();
-    						} catch (CoreException e) {
-    							// TODO Auto-generated catch block
-    							e.printStackTrace();
-    						}
+		optionsDDREFLECTION = new Action(
+	        "&DD REFLECTION", IAction.AS_CHECK_BOX) {
+	      public void run() {
+	    	  	color = "orange";
+	    	  	System.out.println("REFLECTION");
+	    	  	optionsDDNONE.setChecked(false);
+	  		optionsDDNO_BASE_PTRS.setChecked(false);
+	  		optionsDDFULL.setChecked(false);
+	  		optionsDDNO_BASE_NO_HEAP.setChecked(false);
+	  		optionsDDNo_HEAP.setChecked(false);
+	  		
+	  		optionsDDREFLECTION.setChecked(true);
+	  		
+	  		optionsData = optionsData.REFLECTION;
+	      }
+		};
+      	    
+      	   
+	    optionsCDNONE = new Action(
+  	        "&CD NONE", IAction.AS_CHECK_BOX) {
+	      public void run() {
+	    	  	System.out.println("NONE");
+	    	  	optionsCDFULL.setChecked(false);
+	    	  	
+	    	  	optionsCDNONE.setChecked(true);
+	    	  	optionsCD = optionsCD.NONE;
+	    	  	
+	      }
+	    };
+	    
+	    
+	    optionsCDFULL = new Action(
+      	        "&CD FULL", IAction.AS_CHECK_BOX) {
+    	      public void run() {
+    	    	  	System.out.println("FULL");
+    	    	  	optionsCDNONE.setChecked(false);
+    	    	  	
+    	    	  	optionsCDFULL.setChecked(true);
+    	    	  	
+    	    	  	optionsCD = optionsCD.FULL;
+    	      }
+    	    };
+    	    
+    	 automaticClear = new Action(
+          	        "&Automatic Clear", IAction.AS_CHECK_BOX) {
+        	      public void run() {
+        	      }
+        	    };
 
-    					}
+// Action to clear the view
+clearViewAction = createAction(
+		"Clear", "Clears the slice result view.", PluginImages.DESC_CLEAR,
+		new Action() {
+			@Override
+			public void run() {
+				IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+				for(IEditorReference ex : editors) {
+					Highlighting h;
+					try {
+						h = new Highlighting(ex);
+						h.deleteAllMarkers();
+					} catch (PartInitException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			}
+		});
+
+// Action to refresh the view.
+refreshViewAction = createAction(
+		"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE,
+		createPlaceholderAction("Refresh view button clicked!"));
+// enable refresh on pressing F5 etc.
+refreshViewAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
+
+// Action to perform backward slice
+sliceBackwardAction = createAction(
+		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD,
+		new Action() {
+			@Override
+			public void run() {
+				if(automaticClear.isChecked()) {
+				clearViewAction.run();
+				}
+				slice(sliceType.backward);
+			}
+		});
+
+// Action to perform thin backward slice
+sliceThinBackwardAction = createAction(
+		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD,
+		new Action() {
+			@Override
+			public void run() {
+				if(automaticClear.isChecked()) {
+    				clearViewAction.run();
     				}
-    			});
+				slice(sliceType.thinBackward);
+			}
+		});
 
-    	// Action to refresh the view.
-    	refreshViewAction = createAction(
-    			"Refresh", "Refreshes the slice result view.", PluginImages.DESC_UPDATE,
-    			createPlaceholderAction("Refresh view button clicked!"));
-        // enable refresh on pressing F5 etc.
-        refreshViewAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
+// Action to perform forward slice
+sliceForwardAction = createAction(
+		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD,
+		new Action() {
+			@Override
+			public void run() {
+				if(automaticClear.isChecked()) {
+    				clearViewAction.run();
+    				}
+				slice(sliceType.forward);
+			}
+		});
+sliceForwardAction.setText("Slice forward");
+sliceForwardAction.setToolTipText("Performs a forward slice.");
+sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
 
-        // Action to perform backward slice
-        sliceBackwardAction = createAction(
-        		"Slice backward", "Performs a backward slice.", PluginImages.DESC_RUN_BACKWARD,
-        		new Action() {
-        			@Override
-        			public void run() {
-        				slice(sliceType.backward);
-        			}
-        		});
-
-        // Action to perform thin backward slice
-        sliceThinBackwardAction = createAction(
-        		"Slice backward (thin)", "Performs a thin backward slice.", PluginImages.DESC_RUN_BACKWARD,
-        		new Action() {
-        			@Override
-        			public void run() {
-        				slice(sliceType.thinBackward);
-        			}
-        		});
-
-        // Action to perform full backward slice
-        sliceFullBackwardAction = createAction(
-        		"Slice backward (full)", "Performs a full backward slice.", PluginImages.DESC_RUN_BACKWARD,
-        		new Action() {
-        			@Override
-        			public void run() {
-        				slice(sliceType.fullBackward);
-        			}
-        		});
-
-        // Action to perform forward slice
-        sliceForwardAction = createAction(
-        		"Slice forward", "Performs a forward slice.", PluginImages.DESC_RUN_FORWARD,
-        		new Action() {
-        			@Override
-        			public void run() {
-        				slice(sliceType.forward);
-        			}
-        		});
-        sliceForwardAction.setText("Slice forward");
-        sliceForwardAction.setToolTipText("Performs a forward slice.");
-        sliceForwardAction.setImageDescriptor(PluginImages.DESC_RUN_FORWARD);
-    }
+}
 
 	private Action createAction(String text, String toolTipText, ImageDescriptor imageDescriptor, Action action) {
 		action.setText(text);
@@ -260,12 +429,12 @@ public class SliceView extends ViewPart {
             out.add("Statement length: "                 + statementNode.getLength());
             out.add("Method this statement belongs to: " + methodDeclaration.toString());
 
-            clearViewAction.run();
-
             Highlighting h = new Highlighting();
             h.HighlightSelected(textSelection);
             IEditorReference[] editors =PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
             SlicingContext slicingContext = new SlicingContext(editorContext, sliceType);
+            slicingContext.setOptionsCD(optionsCD);
+            slicingContext.setOptionsData(optionsData);
 
             Job mainJob = jobFactory.create(slicingContext);
             mainJob.addJobChangeListener(new JobChangeAdapter() {
@@ -280,7 +449,7 @@ public class SliceView extends ViewPart {
 								for(int i :slicingContext.getMap().get(s)) {
 									try {
 										Highlighting g = new Highlighting(ex);
-										g.HighlightLine(i);
+										g.HighlightLine(i, color);
 									} catch (CoreException | BadLocationException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
