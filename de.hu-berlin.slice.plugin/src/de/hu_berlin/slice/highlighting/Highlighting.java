@@ -138,11 +138,8 @@ public class Highlighting {
 	}
 	
 	public void findcertainMarker(int linenumber)throws CoreException {
-		System.out.println("lol1");
 		List<IMarker> markers = MarkerFactory.findMarkers(file);
 		for (IMarker marker : markers) {
-			System.out.println(marker.getAttribute(IMarker.LINE_NUMBER));
-			System.out.println(linenumber);
 			if(marker.getAttribute(IMarker.LINE_NUMBER).equals(linenumber)) {
 				marker.delete();}
 		}

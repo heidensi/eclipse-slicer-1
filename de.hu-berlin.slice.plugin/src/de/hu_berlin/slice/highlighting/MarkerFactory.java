@@ -87,9 +87,7 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int offset, int length, String color) throws CoreException {
 		IMarker marker = null;
-		System.out.println(color);
 		if (color.equals("blue")) {
-			System.out.println(color);
 		    marker = res.createMarker("de.hu_berlin.slice.marker.blue");
 		    }
 		else if(color.equals("red")) {
