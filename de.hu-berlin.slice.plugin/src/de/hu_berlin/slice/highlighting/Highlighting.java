@@ -48,7 +48,8 @@ public class Highlighting {
 
 		int offset = textSelection.getOffset();
 		int length = textSelection.getLength();
-		MarkerFactory.createMarker(file, offset, length);
+		IMarker marker = MarkerFactory.createMarker(file, offset, length);
+		marker.setAttribute(IMarker.LINE_NUMBER, 1);
 	}
 
 
@@ -83,11 +84,13 @@ public class Highlighting {
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		provider.connect(file);
 		IDocument  document = provider.getDocument(file);
+		findcertainMarker(linenumber-1);
 
 		//-1 because the document starts counting lines at 0 and the editor starts at 1
 		int offset = document.getLineOffset(linenumber - 1);
 		int length = document.getLineLength(linenumber - 1);
-		MarkerFactory.createMarker(file, offset, length, color);
+		IMarker marker = MarkerFactory.createMarker(file, offset, length, color);
+		marker.setAttribute(IMarker.LINE_NUMBER, linenumber-1);
 	}
 
 
@@ -131,6 +134,17 @@ public class Highlighting {
 		List<IMarker> markers = MarkerFactory.findAllMarkers(file);
 		for (IMarker marker : markers) {
 			marker.delete();
+		}
+	}
+	
+	public void findcertainMarker(int linenumber)throws CoreException {
+		System.out.println("lol1");
+		List<IMarker> markers = MarkerFactory.findMarkers(file);
+		for (IMarker marker : markers) {
+			System.out.println(marker.getAttribute(IMarker.LINE_NUMBER));
+			System.out.println(linenumber);
+			if(marker.getAttribute(IMarker.LINE_NUMBER).equals(linenumber)) {
+				marker.delete();}
 		}
 	}
 }

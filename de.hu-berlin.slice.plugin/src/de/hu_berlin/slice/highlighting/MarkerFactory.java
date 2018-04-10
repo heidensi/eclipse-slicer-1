@@ -87,7 +87,9 @@ public class MarkerFactory {
 	 */
 	public static IMarker createMarker(IResource res, int offset, int length, String color) throws CoreException {
 		IMarker marker = null;
+		System.out.println(color);
 		if (color.equals("blue")) {
+			System.out.println(color);
 		    marker = res.createMarker("de.hu_berlin.slice.marker.blue");
 		    }
 		else if(color.equals("red")) {
@@ -121,7 +123,15 @@ public class MarkerFactory {
 	 */
 	public static List<IMarker> findMarkers(IResource resource) {
 		try {
-			return Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_ZERO));
+			List<IMarker> a = new ArrayList<IMarker>();
+			a.addAll(Arrays.asList(resource.findMarkers(MARKER, true, IResource.DEPTH_INFINITE)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.red", true, IResource.DEPTH_ZERO)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.grey", true, IResource.DEPTH_ZERO)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.blue", true, IResource.DEPTH_ZERO)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.yellow", true, IResource.DEPTH_ZERO)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.orange", true, IResource.DEPTH_ZERO)));
+			a.addAll(Arrays.asList(resource.findMarkers("de.hu_berlin.slice.marker.purple", true, IResource.DEPTH_ZERO)));
+			return a;
 		} catch (CoreException e) {
 			return new ArrayList<IMarker>();
 		}
