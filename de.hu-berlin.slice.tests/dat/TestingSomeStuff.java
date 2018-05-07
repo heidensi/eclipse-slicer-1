@@ -1,11 +1,17 @@
-
 public class TestingSomeStuff {
-
 	public static void testing() {
-		// TODO Auto-generated method stub
-		int i = 0;
-		int j = 10;
-		i = i+j;
+//		System.out.print("");
+		int i = 3;
+		
+		i = i+1;
+		
+		while (i < 4) {
+			++i;
+		}
+		
+		i = i+1;
+		
+		System.out.println(i);
 
 	}
 

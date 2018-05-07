@@ -62,10 +62,13 @@ import com.ibm.wala.util.debug.Assertions;
 import com.ibm.wala.util.io.FileProvider;
 import com.ibm.wala.util.strings.StringStuff;
 
+import de.hu_berlin.wala.MyIRFactory;
+import de.hu_berlin.wala.MyShrikeIRFactory;
 
 
 
-public class TestForIR {	
+
+public class TestForIROwnSSABuilder {	
 	private static final String CONSOLE_LINE = "-------------------------------------------";
 	private static final String TEST_DATA_DIR = "../de.hu-berlin.slice.tests/dat/";
 	private static final String ANT_BUILD_FILE = "../de.hu-berlin.slice.tests/dat/build.xml";
@@ -248,7 +251,7 @@ public class TestForIR {
 //		options.getSSAOptions().setPiNodePolicy(SSAOptions.getAllBuiltInPiNodes());
 //			      
 		// Create an object which caches IRs and related information, reconstructing them lazily on demand.
-		IAnalysisCacheView cache = new AnalysisCacheImpl(); //TODO remove options?
+		IAnalysisCacheView cache = new AnalysisCacheImpl(new MyIRFactory()); //TODO remove options?
 		//AnalysisCache cache = new AnalysisCache(null, null, null); 
 		
 		List<Entrypoint> entrypoints = getEntrypoints(cha);
@@ -366,7 +369,6 @@ public class TestForIR {
                 else {
                     System.err.println(String.format("BC Instruction Index: %d, Line number: %d, Instruction: %s", 
                     		bcIndex, bytecodeMethod.getLineNumber(bcIndex), instruction.toString()));
-                    System.err.println(printSourceCodePosition(bytecodeMethod.getSourcePosition(bcIndex)));
                 }
                 
             }
@@ -374,13 +376,7 @@ public class TestForIR {
         }
     }
     
-    private String printSourceCodePosition(SourcePosition sp) {
-		return String.format("fO: %d, fC: %d, fL: %d, lO: %d, lC: %d, lL: %d",
-				sp.getFirstOffset(), sp.getFirstCol(), sp.getFirstLine(),
-				sp.getLastOffset(), sp.getLastCol(), sp.getLastLine());
-	}
-
-	/**
+    /**
      * Prints out all the BC Instructions from the shrike cfg and full IR
      * @throws InvalidClassFileException
      */

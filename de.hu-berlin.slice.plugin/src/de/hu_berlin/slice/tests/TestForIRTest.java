@@ -7,15 +7,22 @@ import org.junit.Test;
 
 public class TestForIRTest {
 	TestForIR firstTest;
+	private TestForIROwnSSABuilder firstTestOwn;
 	
 	@Before
 	public void before() {
 		firstTest = new TestForIR();
+		firstTestOwn = new TestForIROwnSSABuilder();
 	}
 	
 	@Test
 	public void test() {
-		assertTrue(firstTest.test("TestingSomeStuff", 4, "TestingSomeStuff.testing()V"));
+		assertEquals(3, firstTest.test("TestingSomeStuff", "TestingSomeStuff.testing()V"));
+	}
+	
+	@Test
+	public void testOwn() {
+		assertEquals(3, firstTestOwn.test("TestingSomeStuffOwn", "TestingSomeStuffOwn.testing()V"));
 	}
 
 }
